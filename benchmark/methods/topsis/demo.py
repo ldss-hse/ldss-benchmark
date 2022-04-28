@@ -18,7 +18,11 @@ def main():
     decision_maker.set_criteria_weights(criteria_weights)
     decision_maker.set_alternatives_type(alternatives_type)
 
-    decision_maker.run()
+    res = decision_maker.run()
+
+    print('TOPSIS finished making recommendations. In order of decreasing priority:')
+    for index, value in res:
+        print(f'\tA{int(index)+1}\t{value}')
 
 
 if __name__ == '__main__':

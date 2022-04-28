@@ -3,12 +3,10 @@ from typing import Optional
 import numpy as np
 
 from benchmark.assessments.decision_matrix import DecisionMatrix
+from benchmark.methods.common.idecision_maker import IDecisionMaker
 
 
-class TopsisDecisionMaker:
-    _decision_matrix: DecisionMatrix
-    criteria_weights: Optional[list[float]]
-    is_benefit_criteria: Optional[tuple[bool]]
+class TopsisDecisionMaker(IDecisionMaker):
     _artificial_ideal_alternative: Optional[np.ndarray]
     _artificial_ideal_negative_alternative: Optional[np.ndarray]
     _separation_measure_from_ideal: Optional[np.ndarray]
@@ -17,17 +15,10 @@ class TopsisDecisionMaker:
     _preference_order_indexes: Optional[np.ndarray]
 
     def __init__(self, decision_matrix: DecisionMatrix):
-        self._decision_matrix = decision_matrix
-        self.criteria_weights = None
+        super().__init__(decision_matrix)
         self.is_benefit_criteria = None
         self._artificial_ideal_alternative = None
         self._artificial_ideal_negative_alternative = None
-
-    def set_criteria_weights(self, criteria_weights):
-        self.criteria_weights = criteria_weights
-
-    def set_alternatives_type(self, is_benefit_criteria: tuple[bool]):
-        self.is_benefit_criteria = is_benefit_criteria
 
     def run(self):
         # 1. Normalize Decision Matrix
