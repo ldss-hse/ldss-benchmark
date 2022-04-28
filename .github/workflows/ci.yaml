@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          bash ./config/venv_setup.sh
+          bash .config/venv_setup.sh
       - name: Confirming everything is OK
         run: |
           ls -la ~/.local/bin
@@ -61,7 +61,7 @@ jobs:
             ${{ runner.os }}-venv-
       - name: Code Syle
         run: |
-          bash ./config/run_lint.sh
+          bash .config/run_lint.sh
 
   unittests:
     name: Unittests
@@ -86,4 +86,4 @@ jobs:
             ${{ runner.os }}-venv-
       - name: Unittests
         run: |
-          bash ./config/run_tests.sh
+          bash .config/run_tests.sh
