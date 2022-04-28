@@ -35,7 +35,6 @@ jobs:
           bash .config/venv_setup.sh
       - name: Confirming everything is OK
         run: |
-          ls -la ~/.local/bin
           ls -la venv
 
   code-style:
