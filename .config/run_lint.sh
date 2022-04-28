@@ -5,6 +5,6 @@ echo 'Running lint check...'
 
 source venv/bin/activate
 
-python -m pylint benchmark
+python -m pylint benchmark --rcfile .config/.pylintrc
 
 echo "Pylint passed."

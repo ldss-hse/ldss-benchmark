@@ -5,8 +5,8 @@ from benchmark.methods.topsis.core import TopsisDecisionMaker
 
 
 def test_ideal_alternatives():
-    dm: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
-    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(dm)
+    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(decision_matrix)
     criteria_weights = (.2, .1, .1, .1, .2, .3)
     alternatives_type = (True, True, True, False, True, True)
     decision_maker.set_criteria_weights(criteria_weights)
@@ -20,7 +20,7 @@ def test_ideal_alternatives():
         [.4204, .4882, .5308, .4143, .6736, .5217],
         [.5139, .4392, .5056, .4603, .4811, .3727],
     ]
-    dm._normalized = np.array(their_normalized)
+    decision_matrix._normalized = np.array(their_normalized)
 
     res = decision_maker.run()
 

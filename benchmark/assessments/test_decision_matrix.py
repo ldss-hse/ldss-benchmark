@@ -4,8 +4,8 @@ from .decision_matrix import DecisionMatrix, DecisionMatrixFactory
 
 
 def test_matrix_normalization():
-    dm: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
-    dm.normalize()
+    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    decision_matrix.normalize()
 
     expected_matrix_raw = [
         [.4671, .3662, .5056, .5069, .4811, .6708],
@@ -15,14 +15,14 @@ def test_matrix_normalization():
     ]
     expected_matrix = np.array(expected_matrix_raw)
 
-    assert np.array_equal(dm.get_normalized(), expected_matrix), 'Normalization failed'
+    assert np.array_equal(decision_matrix.get_normalized(), expected_matrix), 'Normalization failed'
 
 
 def test_criteria_weighting():
-    dm: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
-    dm.normalize()
+    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    decision_matrix.normalize()
     criteria_weights = (.2, .1, .1, .1, .2, .3)
-    dm.apply_criteria_weights(criteria_weights)
+    decision_matrix.apply_criteria_weights(criteria_weights)
 
     expected_matrix_raw = [
         [.0934, .0366, .0506, .0507, .0962, .2012],
@@ -32,11 +32,11 @@ def test_criteria_weighting():
     ]
     expected_matrix = np.array(expected_matrix_raw)
 
-    assert np.array_equal(dm.get_weighted(), expected_matrix), 'Weighting failed'
+    assert np.array_equal(decision_matrix.get_weighted(), expected_matrix), 'Weighting failed'
 
 
 def test_criteria_weighting_from_book():
-    dm: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
 
     # in the original book example seems to contain errors during normalization. However,
     # in order to follow other computations we need to keep their normalized matrix
@@ -46,10 +46,10 @@ def test_criteria_weighting_from_book():
         [.4204, .4882, .5308, .4143, .6736, .5217],
         [.5139, .4392, .5056, .4603, .4811, .3727],
     ]
-    dm._normalized = np.array(their_normalized)
+    decision_matrix._normalized = np.array(their_normalized)
 
     criteria_weights = (.2, .1, .1, .1, .2, .3)
-    dm.apply_criteria_weights(criteria_weights)
+    decision_matrix.apply_criteria_weights(criteria_weights)
 
     expected_matrix_weighted = [
         [.0934, .0366, .0506, .0506, .0962, .2012],
@@ -59,4 +59,4 @@ def test_criteria_weighting_from_book():
     ]
     expected_matrix = np.array(expected_matrix_weighted)
 
-    assert np.array_equal(dm.get_weighted(), expected_matrix), 'Weighting failed'
+    assert np.array_equal(decision_matrix.get_weighted(), expected_matrix), 'Weighting failed'
