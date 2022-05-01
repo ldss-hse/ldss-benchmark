@@ -1,0 +1,132 @@
+{
+  "abstractionLevels": [
+    {
+      "abstractionLevelID": "group1",
+      "abstractionLevelName": "Abstraction level no. 1"
+    }
+  ],
+  "abstractionLevelWeights": {
+    "group1": 1
+  },
+  "scales": [
+    {
+      "scaleID": "s5",
+      "scaleName": "Scale Five Interval Scale (p. 28)",
+      "labels": [
+        "very low",
+        "low",
+        "average",
+        "high",
+        "very high"
+      ]
+    }
+  ],
+  "criteria": {
+    "group1": [
+      {
+        "criteriaID": "C1",
+        "criteriaName": "Maximum speed",
+        "qualitative": false,
+        "units": "Mach",
+        "isBenefit": true
+      },
+      {
+        "criteriaID": "C2",
+        "criteriaName": "Ferry range",
+        "qualitative": false,
+        "units": "NM",
+        "isBenefit": true
+      },
+      {
+        "criteriaID": "C3",
+        "criteriaName": "Maximum payload",
+        "qualitative": false,
+        "units": "pounds",
+        "isBenefit": true
+      },
+      {
+        "criteriaID": "C4",
+        "criteriaName": "Purchasing cost",
+        "qualitative": false,
+        "units": "$M",
+        "isBenefit": false
+      },
+      {
+        "criteriaID": "C5",
+        "criteriaName": "Reliability",
+        "qualitative": true,
+        "usesLinguisticScales": false,
+        "units": "High-Low",
+        "isBenefit": true
+      },
+      {
+        "criteriaID": "C6",
+        "criteriaName": "Maneuverability",
+        "qualitative": true,
+        "usesLinguisticScales": false,
+        "units": "High-Low",
+        "isBenefit": true
+      }
+    ]
+  },
+  "criteriaWeightsPerGroup": {
+    "group1": [
+      0.2,
+      0.1,
+      0.1,
+      0.1,
+      0.2,
+      0.3
+    ]
+  },
+  "alternatives": [
+    {
+      "alternativeID": "A1",
+      "alternativeName": "Jet Fighter no. 1",
+      "abstractionLevelID": "group1"
+    },
+    {
+      "alternativeID": "A2",
+      "alternativeName": "Jet Fighter no. 2",
+      "abstractionLevelID": "group1"
+    },
+    {
+      "alternativeID": "A3",
+      "alternativeName": "Jet Fighter no. 3",
+      "abstractionLevelID": "group1"
+    },
+    {
+      "alternativeID": "A4",
+      "alternativeName": "Jet Fighter no. 4",
+      "abstractionLevelID": "group1"
+    }
+  ],
+  "expertWeightsRule": {
+    "1": 1.0
+  },
+  "experts": [
+    {
+      "expertName": "expert1",
+      "expertID": "US Army expert no. 1",
+      "competencies": [
+        "jet fighters"
+      ]
+    }
+  ],
+  "estimations": {
+    "expert1": [
+      {
+        "alternativeID": "A1",
+        "criteria2Estimation": [
+          {
+            "criteriaID": "C1",
+            "qualitative": false,
+            "estimation": [
+              ""
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

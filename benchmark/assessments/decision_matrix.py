@@ -35,7 +35,7 @@ class DecisionMatrixFactory:
     @staticmethod
     def from_book_aircraft_example() -> DecisionMatrix:
         """
-        Example taken from TOPSIS book, page 133
+        Example taken from TOPSIS book, page 17, 133
         :return: DecisionMatrix instance with raw assessments
         """
         raw_data = [
