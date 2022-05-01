@@ -3,7 +3,7 @@ from benchmark.methods.electre_i.core import ElectreDecisionMaker
 
 
 def main():
-    print('Running TOPSIS method')
+    print('Running ELECTRE I method')
     decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
     decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(decision_matrix)
     criteria_weights = (.2, .1, .1, .1, .2, .3)

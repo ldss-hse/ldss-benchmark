@@ -1,6 +1,9 @@
 import itertools
+from collections import namedtuple
 from typing import Optional
 
+import matplotlib.pyplot
+import networkx as nx
 import numpy as np
 
 from benchmark.assessments.decision_matrix import DecisionMatrix
@@ -10,8 +13,12 @@ from benchmark.methods.common.idecision_maker import IDecisionMaker
 class ElectreDecisionMaker(IDecisionMaker):
     _concordance: Optional[dict[tuple[int, int], set[int]]]
     _concordance_matrix: Optional[np.ndarray]
+    _concordance_dominance_matrix: Optional[np.ndarray]
     _discordance: Optional[dict[tuple[int, int], set[int]]]
     _discordance_matrix: Optional[np.ndarray]
+    _discordance_dominance_matrix: Optional[np.ndarray]
+    _aggregate_dominance_matrix: Optional[np.ndarray]
+    _preference_order_indexes: Optional[np.ndarray]
 
     def __init__(self, decision_matrix: DecisionMatrix):
         super().__init__(decision_matrix)
@@ -19,6 +26,10 @@ class ElectreDecisionMaker(IDecisionMaker):
         self._concordance_matrix = None
         self._discordance = None
         self._discordance_matrix = None
+        self._concordance_dominance_matrix = None
+        self._discordance_dominance_matrix = None
+        self._aggregate_dominance_matrix = None
+        self._preference_order_indexes = None
 
     def run(self):
         # 1. Normalize Decision Matrix
@@ -31,11 +42,25 @@ class ElectreDecisionMaker(IDecisionMaker):
         # 3. Determine the concordance and discordance sets
         self._determine_concordance_sets()
 
-        # 3. Calculate the concordance matrix
+        # 4. Calculate the concordance matrix
         self._calculate_concordance_matrix()
 
-        # 4. Calculate the discordance matrix
+        # 5. Calculate the discordance matrix
         self._calculate_discordance_matrix()
+
+        # 6. Calculate the concordance dominance matrix
+        self._calculate_concordance_dominance_matrix()
+
+        # 7. Calculate the discordance dominance matrix
+        self._calculate_discordance_dominance_matrix()
+
+        # 8. Calculate the aggregate dominance matrix
+        self._calculate_aggregate_dominance_matrix()
+
+        # 9. Calculate the aggregate dominance matrix
+        self._eliminate_alternatives()
+
+        return self._preference_order_indexes
 
     def _determine_concordance_sets(self):
         self._concordance = {}
@@ -98,4 +123,25 @@ class ElectreDecisionMaker(IDecisionMaker):
 
         self._discordance_matrix = np.around(self._discordance_matrix, 4)
 
+    def _calculate_concordance_dominance_matrix(self):
+        num_alternatives = len(self._decision_matrix.get_weighted())
+        self._average_concordance_index = np.sum(self._concordance_matrix) / (num_alternatives * (num_alternatives - 1))
+        self._concordance_dominance_matrix = self._concordance_matrix >= self._average_concordance_index
 
+    def _calculate_discordance_dominance_matrix(self):
+        num_alternatives = len(self._decision_matrix.get_weighted())
+        self._average_discordance_index = np.sum(self._discordance_matrix) / (num_alternatives * (num_alternatives - 1))
+        self._discordance_dominance_matrix = self._discordance_matrix <= self._average_discordance_index
+        np.fill_diagonal(self._discordance_dominance_matrix, False)
+
+    def _calculate_aggregate_dominance_matrix(self):
+        self._aggregate_dominance_matrix = self._concordance_dominance_matrix * self._discordance_dominance_matrix
+
+    def _eliminate_alternatives(self):
+        dependency_graph = nx.from_numpy_matrix(self._aggregate_dominance_matrix, create_using=nx.DiGraph)
+
+        # uncomment if you need to visualize the dependency graph
+        # matplotlib.pyplot.ion()
+        # nx.draw(dependency_graph, with_labels=True)
+
+        self._preference_order_indexes = np.array([[i, 0] for i in nx.topological_sort(dependency_graph)])

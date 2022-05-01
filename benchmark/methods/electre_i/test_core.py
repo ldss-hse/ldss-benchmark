@@ -22,7 +22,7 @@ def test_ideal_alternatives():
     ]
     decision_matrix._normalized = np.array(their_normalized)
 
-    decision_maker.run()
+    res = decision_maker.run()
 
     # all criteria IDs are subtracted with 1 as we are living in 0-indexing world
     expected_concordance = {
@@ -76,3 +76,42 @@ def test_ideal_alternatives():
     expected_discordance_matrix = np.array(expected_discordance_matrix_raw)
     assert np.allclose(decision_maker._discordance_matrix, expected_discordance_matrix), \
         'Discordance matrix does not match'
+
+    expected_concordance_dominance_matrix_raw = [
+        [False, True, False, True],
+        [False, False, False, True],
+        [False, True, False, True],
+        [True, True, False, False]
+    ]
+    expected_concordance_dominance_matrix = np.array(expected_concordance_dominance_matrix_raw)
+    assert np.allclose(decision_maker._concordance_dominance_matrix, expected_concordance_dominance_matrix), \
+        'Concordance dominance matrix does not match'
+
+    expected_discordance_dominance_matrix_raw = [
+        [False, True, False, True],
+        [False, False, False, False],
+        [False, True, False, True],
+        [False, True, False, False]
+    ]
+    expected_discordance_dominance_matrix = np.array(expected_discordance_dominance_matrix_raw)
+    assert np.allclose(decision_maker._discordance_dominance_matrix, expected_discordance_dominance_matrix), \
+        'Discordance dominance matrix does not match'
+
+    expected_aggregate_dominance_matrix_raw = [
+        [False, True, False, True],
+        [False, False, False, False],
+        [False, True, False, True],
+        [False, True, False, False]
+    ]
+    expected_aggregate_dominance_matrix = np.array(expected_aggregate_dominance_matrix_raw)
+    assert np.allclose(decision_maker._aggregate_dominance_matrix, expected_aggregate_dominance_matrix), \
+        'Aggregate dominance matrix does not match'
+
+    expected_res_raw = [
+        [0, 0],
+        [2, 0],
+        [3, 0],
+        [1, 0],
+    ]
+    expected_res = np.array(expected_res_raw)
+    assert np.array_equal(res, expected_res), 'Reported aggregation results do not match'
