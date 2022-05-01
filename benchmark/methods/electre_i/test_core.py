@@ -1,3 +1,4 @@
+# pylint: disable=too-many-locals
 import numpy as np
 
 from benchmark.assessments.decision_matrix import DecisionMatrix, DecisionMatrixFactory

@@ -1,8 +1,6 @@
 import itertools
-from collections import namedtuple
 from typing import Optional
 
-import matplotlib.pyplot
 import networkx as nx
 import numpy as np
 
@@ -94,8 +92,8 @@ class ElectreDecisionMaker(IDecisionMaker):
         num_alternatives = len(self._decision_matrix.get_weighted())
         self._concordance_matrix = np.zeros((num_alternatives, num_alternatives))
 
-        for k_index in range(len(self._concordance_matrix)):
-            for l_index in range(len(self._concordance_matrix[k_index])):
+        for k_index, _ in enumerate(self._concordance_matrix):
+            for l_index, _ in enumerate(self._concordance_matrix[k_index]):
                 if k_index == l_index:
                     continue
                 criteria_indexes = np.array(list(self._concordance[(k_index, l_index)]))
@@ -107,8 +105,8 @@ class ElectreDecisionMaker(IDecisionMaker):
         num_alternatives = len(self._decision_matrix.get_weighted())
         self._discordance_matrix = np.zeros((num_alternatives, num_alternatives))
 
-        for k_index in range(len(self._concordance_matrix)):
-            for l_index in range(len(self._concordance_matrix[k_index])):
+        for k_index, _ in enumerate(self._concordance_matrix):
+            for l_index, _ in enumerate(self._concordance_matrix[k_index]):
                 if k_index == l_index:
                     continue
 
@@ -125,13 +123,13 @@ class ElectreDecisionMaker(IDecisionMaker):
 
     def _calculate_concordance_dominance_matrix(self):
         num_alternatives = len(self._decision_matrix.get_weighted())
-        self._average_concordance_index = np.sum(self._concordance_matrix) / (num_alternatives * (num_alternatives - 1))
-        self._concordance_dominance_matrix = self._concordance_matrix >= self._average_concordance_index
+        _average_concordance_index = np.sum(self._concordance_matrix) / (num_alternatives * (num_alternatives - 1))
+        self._concordance_dominance_matrix = self._concordance_matrix >= _average_concordance_index
 
     def _calculate_discordance_dominance_matrix(self):
         num_alternatives = len(self._decision_matrix.get_weighted())
-        self._average_discordance_index = np.sum(self._discordance_matrix) / (num_alternatives * (num_alternatives - 1))
-        self._discordance_dominance_matrix = self._discordance_matrix <= self._average_discordance_index
+        _average_discordance_index = np.sum(self._discordance_matrix) / (num_alternatives * (num_alternatives - 1))
+        self._discordance_dominance_matrix = self._discordance_matrix <= _average_discordance_index
         np.fill_diagonal(self._discordance_dominance_matrix, False)
 
     def _calculate_aggregate_dominance_matrix(self):
@@ -141,6 +139,7 @@ class ElectreDecisionMaker(IDecisionMaker):
         dependency_graph = nx.from_numpy_matrix(self._aggregate_dominance_matrix, create_using=nx.DiGraph)
 
         # uncomment if you need to visualize the dependency graph
+        # import matplotlib.pyplot
         # matplotlib.pyplot.ion()
         # nx.draw(dependency_graph, with_labels=True)
 
