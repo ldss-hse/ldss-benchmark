@@ -1,4 +1,4 @@
-from benchmark.assessments.decision_matrix import DecisionMatrix, DecisionMatrixFactory
+from benchmark.task.assessments.decision_matrix import DecisionMatrix, DecisionMatrixFactory
 from benchmark.methods.electre_i.core import ElectreDecisionMaker
 
 

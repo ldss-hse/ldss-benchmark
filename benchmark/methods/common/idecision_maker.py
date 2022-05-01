@@ -1,6 +1,6 @@
 from typing import Optional
 
-from benchmark.assessments.decision_matrix import DecisionMatrix
+from benchmark.task.assessments.decision_matrix import DecisionMatrix
 
 
 class IDecisionMaker:

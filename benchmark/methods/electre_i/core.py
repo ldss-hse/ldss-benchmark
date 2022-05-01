@@ -4,7 +4,7 @@ from typing import Optional
 import networkx as nx
 import numpy as np
 
-from benchmark.assessments.decision_matrix import DecisionMatrix
+from benchmark.task.assessments.decision_matrix import DecisionMatrix
 from benchmark.methods.common.idecision_maker import IDecisionMaker
 
 
