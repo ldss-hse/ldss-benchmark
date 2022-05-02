@@ -17,7 +17,7 @@ class CriterionDescription:
     qualitative: bool = Field(...,
                               title='Marker whether this criterion is qualitative')
     units: Optional[str] = Field(title='Units of measurement for the given criterion')
-    isBenefit: Optional[bool] = Field(title='Flag denotes if this criteria is better is a value is bigger')
+    benefit: Optional[bool] = Field(title='Flag denotes if this criteria is better is a value is bigger')
 
 
 @dataclass

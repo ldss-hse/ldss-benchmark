@@ -24,5 +24,5 @@ class Criteria:
                 criterion_info: CriterionDescription
                 self.criterion_to_index[criterion_info.criteriaID] = criterion_index
                 self.criteria_full[criterion_index] = criterion_info
-                self.criteria_types.append(criterion_info.isBenefit)
+                self.criteria_types.append(criterion_info.benefit)
                 criterion_index += 1
