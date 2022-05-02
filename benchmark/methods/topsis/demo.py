@@ -5,7 +5,6 @@ Ching-Lai Hwang, Kwangsun Yoon. Multiple Attribute Decision Making Methods and A
 A State-of-the-Art Survey.
 """
 from benchmark.constants import TASKS_ROOT
-from benchmark.task.assessments.decision_matrix import DecisionMatrixFactory, DecisionMatrix
 from benchmark.methods.topsis.core import TopsisDecisionMaker
 from benchmark.task.task_model import TaskModelFactory
 

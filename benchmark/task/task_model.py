@@ -2,12 +2,12 @@ from pathlib import Path
 
 import numpy as np
 
+from benchmark.task.assessments.decision_matrix import DecisionMatrix
+from benchmark.task.converters import _get_crisp_linguistic_assessment_from_json, _get_numeric_assessment_from_json
 from benchmark.task.models.alternatives import Alternatives
-from .assessments.decision_matrix import DecisionMatrix
 from benchmark.task.models.criteria import Criteria
 from benchmark.task.models.scales import Scales
-from .converters import _get_crisp_linguistic_assessment_from_json, _get_numeric_assessment_from_json
-from .schemas.task_scheme import TaskDTOScheme, AlternativeAssessmentDescription, \
+from benchmark.task.schemas.task_scheme import TaskDTOScheme, AlternativeAssessmentDescription, \
     AlternativeAssessmentForSingleCriteriaDescription, ScalesDescription
 
 
@@ -68,7 +68,7 @@ class TaskModel:
                     if criterion_assessment.scaleID:  # is linguistic
                         scale: ScalesDescription = self._scales[criterion_assessment.scaleID]
                         if not scale.values:
-                            return NotImplemented('unable to work with fuzzy linguistic data')
+                            return NotImplemented  # unable to work with fuzzy linguistic data
                         assert len(criterion_assessment.estimation) == 1, 'Crisp linguistic values cannot be fuzzy'
                         value = _get_crisp_linguistic_assessment_from_json(criterion_assessment.estimation[0], scale)
                     else:  # is numeric
@@ -94,6 +94,6 @@ class TaskModelFactory:
     def from_json(self, json_path: Path) -> TaskModel:
         with json_path.open(encoding='utf-8') as task_file:
             task_raw = task_file.read()
-
+        # pylint: disable=no-member
         task_parsed = TaskDTOScheme.__pydantic_model__.parse_raw(task_raw)
         return TaskModel(task_parsed)

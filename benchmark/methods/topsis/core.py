@@ -2,7 +2,6 @@ from typing import Optional
 
 import numpy as np
 
-from benchmark.task.assessments.decision_matrix import DecisionMatrix
 from benchmark.methods.common.idecision_maker import IDecisionMaker
 from benchmark.task.task_model import TaskModel
 

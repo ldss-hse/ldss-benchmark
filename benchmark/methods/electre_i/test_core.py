@@ -2,7 +2,6 @@
 import numpy as np
 
 from benchmark.constants import TASKS_ROOT
-from benchmark.task.assessments.decision_matrix import DecisionMatrix, DecisionMatrixFactory
 from benchmark.methods.electre_i.core import ElectreDecisionMaker
 from benchmark.task.task_model import TaskModelFactory
 

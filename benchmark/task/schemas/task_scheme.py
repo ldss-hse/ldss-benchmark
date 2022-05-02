@@ -1,9 +1,10 @@
+# pylint: disable=invalid-name
 """
 Schemas for validation of task creation REST request
 """
 from typing import List, Dict, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pydantic.dataclasses import dataclass
 
 
