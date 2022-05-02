@@ -1,10 +1,15 @@
 import numpy as np
 
 from .decision_matrix import DecisionMatrix, DecisionMatrixFactory
+from ..task_model import TaskModelFactory
+from ...constants import TASKS_ROOT
 
 
 def test_matrix_normalization():
-    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    path_to_task = TASKS_ROOT / '1_aircraft' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+    decision_matrix = list(task._decision_matrices.values())[0]
+
     decision_matrix.normalize()
 
     expected_matrix_raw = [
@@ -19,7 +24,10 @@ def test_matrix_normalization():
 
 
 def test_criteria_weighting():
-    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    path_to_task = TASKS_ROOT / '1_aircraft' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+    decision_matrix = list(task._decision_matrices.values())[0]
+
     decision_matrix.normalize()
     criteria_weights = (.2, .1, .1, .1, .2, .3)
     decision_matrix.apply_criteria_weights(criteria_weights)
@@ -36,7 +44,9 @@ def test_criteria_weighting():
 
 
 def test_criteria_weighting_from_book():
-    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
+    path_to_task = TASKS_ROOT / '1_aircraft' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+    decision_matrix = list(task._decision_matrices.values())[0]
 
     # in the original book example seems to contain errors during normalization. However,
     # in order to follow other computations we need to keep their normalized matrix

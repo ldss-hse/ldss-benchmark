@@ -11,8 +11,6 @@ def test_ideal_alternatives():
 
     decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(task)
 
-
-
     # in the original book example seems to contain errors during normalization. However,
     # in order to follow other computations we need to keep their normalized matrix
     their_normalized = [
