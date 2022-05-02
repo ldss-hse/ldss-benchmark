@@ -91,6 +91,7 @@ class ResultAlternativeAssessmentDescription:
 @dataclass
 class TaskDTOScheme:
     criteria: Dict[str, List[CriterionDescription]]
+    criteriaWeightsPerGroup: Dict[str, List[float]]
     alternatives: List[AlternativeDescription]
     scales: List[ScalesDescription]
     abstractionLevels: List[AbstractionLevelDescription]

@@ -4,8 +4,8 @@ from typing import Optional
 import networkx as nx
 import numpy as np
 
-from benchmark.task.assessments.decision_matrix import DecisionMatrix
 from benchmark.methods.common.idecision_maker import IDecisionMaker
+from benchmark.task.task_model import TaskModel
 
 
 class ElectreDecisionMaker(IDecisionMaker):
@@ -18,8 +18,8 @@ class ElectreDecisionMaker(IDecisionMaker):
     _aggregate_dominance_matrix: Optional[np.ndarray]
     _preference_order_indexes: Optional[np.ndarray]
 
-    def __init__(self, decision_matrix: DecisionMatrix):
-        super().__init__(decision_matrix)
+    def __init__(self, task: TaskModel):
+        super().__init__(task)
         self._concordance = None
         self._concordance_matrix = None
         self._discordance = None
@@ -31,11 +31,11 @@ class ElectreDecisionMaker(IDecisionMaker):
 
     def run(self):
         # 1. Normalize Decision Matrix
-        self._decision_matrix.normalize()
+        self._normalize_matrices()
 
         # 2. Calculate weighted Decision Matrix
-        assert self.criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
-        self._decision_matrix.apply_criteria_weights(self.criteria_weights)
+        assert self._criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
+        self._apply_criteria_weights()
 
         # 3. Determine the concordance and discordance sets
         self._determine_concordance_sets()
@@ -64,7 +64,7 @@ class ElectreDecisionMaker(IDecisionMaker):
         self._concordance = {}
         self._discordance = {}
 
-        weighted_dm = self._decision_matrix.get_weighted()
+        weighted_dm = self.get_first_decision_matrix().get_weighted()
 
         alternatives_ids = list(range(len(weighted_dm)))
         comparison_pairs = itertools.product(alternatives_ids, alternatives_ids)
@@ -81,36 +81,34 @@ class ElectreDecisionMaker(IDecisionMaker):
             self._discordance[pair] = set()
 
             for criteria_index, (k_assessment, l_assessment) in enumerate(zip(k_assessments, l_assessments)):
-                is_benefit_and_ge = k_assessment >= l_assessment and self.is_benefit_criteria[criteria_index]
-                is_cost_and_le = k_assessment < l_assessment and not self.is_benefit_criteria[criteria_index]
+                is_benefit_and_ge = k_assessment >= l_assessment and self._criteria_types[criteria_index]
+                is_cost_and_le = k_assessment < l_assessment and not self._criteria_types[criteria_index]
                 if is_benefit_and_ge or is_cost_and_le:
                     self._concordance[pair].add(criteria_index)
                 else:
                     self._discordance[pair].add(criteria_index)
 
     def _calculate_concordance_matrix(self):
-        num_alternatives = len(self._decision_matrix.get_weighted())
-        self._concordance_matrix = np.zeros((num_alternatives, num_alternatives))
+        self._concordance_matrix = np.zeros((self._task.num_alternatives, self._task.num_alternatives))
 
         for k_index, _ in enumerate(self._concordance_matrix):
             for l_index, _ in enumerate(self._concordance_matrix[k_index]):
                 if k_index == l_index:
                     continue
                 criteria_indexes = np.array(list(self._concordance[(k_index, l_index)]))
-                weights = np.array(self.criteria_weights).take(criteria_indexes)
-                concordance_index = np.sum(weights) / np.sum(self.criteria_weights)
+                weights = np.array(self._criteria_weights).take(criteria_indexes)
+                concordance_index = np.sum(weights) / np.sum(self._criteria_weights)
                 self._concordance_matrix[k_index][l_index] = concordance_index
 
     def _calculate_discordance_matrix(self):
-        num_alternatives = len(self._decision_matrix.get_weighted())
-        self._discordance_matrix = np.zeros((num_alternatives, num_alternatives))
+        self._discordance_matrix = np.zeros((self._task.num_alternatives, self._task.num_alternatives))
 
+        decision_matrix = self.get_first_decision_matrix().get_weighted()
         for k_index, _ in enumerate(self._concordance_matrix):
             for l_index, _ in enumerate(self._concordance_matrix[k_index]):
                 if k_index == l_index:
                     continue
 
-                decision_matrix = self._decision_matrix.get_weighted()
                 discordance_indexes = self._discordance[(k_index, l_index)]
                 k_selected_values = decision_matrix[k_index].take(list(discordance_indexes))
                 l_selected_values = decision_matrix[l_index].take(list(discordance_indexes))
@@ -122,13 +120,13 @@ class ElectreDecisionMaker(IDecisionMaker):
         self._discordance_matrix = np.around(self._discordance_matrix, 4)
 
     def _calculate_concordance_dominance_matrix(self):
-        num_alternatives = len(self._decision_matrix.get_weighted())
-        _average_concordance_index = np.sum(self._concordance_matrix) / (num_alternatives * (num_alternatives - 1))
+        _average_concordance_index = np.sum(self._concordance_matrix) / (
+                self._task.num_alternatives * (self._task.num_alternatives - 1))
         self._concordance_dominance_matrix = self._concordance_matrix >= _average_concordance_index
 
     def _calculate_discordance_dominance_matrix(self):
-        num_alternatives = len(self._decision_matrix.get_weighted())
-        _average_discordance_index = np.sum(self._discordance_matrix) / (num_alternatives * (num_alternatives - 1))
+        _average_discordance_index = np.sum(self._discordance_matrix) / (
+                    self._task.num_alternatives * (self._task.num_alternatives - 1))
         self._discordance_dominance_matrix = self._discordance_matrix <= _average_discordance_index
         np.fill_diagonal(self._discordance_dominance_matrix, False)
 

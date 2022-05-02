@@ -17,6 +17,9 @@ class DecisionMatrix:
     def get_normalized(self):
         return self._normalized
 
+    def get_raw(self):
+        return self._raw
+
     def get_weighted(self) -> np.ndarray:
         return self._weighted
 

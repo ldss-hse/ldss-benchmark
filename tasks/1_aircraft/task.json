@@ -111,8 +111,8 @@
   },
   "experts": [
     {
-      "expertName": "expert1",
-      "expertID": "US Army expert no. 1",
+      "expertName": "US Army expert no. 1",
+      "expertID": "expert1",
       "competencies": [
         "jet fighters"
       ]
