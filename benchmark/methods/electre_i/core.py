@@ -143,8 +143,8 @@ class ElectreDecisionMaker(IDecisionMaker):
         dependency_graph = nx.from_numpy_matrix(self._aggregate_dominance_matrix, create_using=nx.DiGraph)
 
         # uncomment if you need to visualize the dependency graph
-        import matplotlib.pyplot
-        matplotlib.pyplot.ion()
-        nx.draw(dependency_graph, with_labels=True)
+        # import matplotlib.pyplot
+        # matplotlib.pyplot.ion()
+        # nx.draw(dependency_graph, with_labels=True)
 
         self._preference_order_indexes = np.array([[i, 0] for i in nx.topological_sort(dependency_graph)])
