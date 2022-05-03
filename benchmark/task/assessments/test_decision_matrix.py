@@ -1,8 +1,7 @@
 import numpy as np
 
-from .decision_matrix import DecisionMatrix, DecisionMatrixFactory
-from ..task_model import TaskModelFactory
-from ...constants import TASKS_ROOT
+from benchmark.constants import TASKS_ROOT
+from benchmark.task.task_model import TaskModelFactory
 
 
 def test_matrix_normalization():
