@@ -2,8 +2,8 @@ from typing import Optional
 
 import numpy as np
 
-from benchmark.assessments.decision_matrix import DecisionMatrix
 from benchmark.methods.common.idecision_maker import IDecisionMaker
+from benchmark.task.task_model import TaskModel
 
 
 class TopsisDecisionMaker(IDecisionMaker):
@@ -14,22 +14,22 @@ class TopsisDecisionMaker(IDecisionMaker):
     _relative_closeness: Optional[np.ndarray]
     _preference_order_indexes: Optional[np.ndarray]
 
-    def __init__(self, decision_matrix: DecisionMatrix):
-        super().__init__(decision_matrix)
+    def __init__(self, task: TaskModel):
+        super().__init__(task)
         self.is_benefit_criteria = None
         self._artificial_ideal_alternative = None
         self._artificial_ideal_negative_alternative = None
 
     def run(self):
         # 1. Normalize Decision Matrix
-        self._decision_matrix.normalize()
+        self._normalize_matrices()
 
         # 2. Calculate weighted Decision Matrix
-        assert self.criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
-        self._decision_matrix.apply_criteria_weights(self.criteria_weights)
+        assert self._criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
+        self._apply_criteria_weights()
 
         # 3. Determine ideal and negative-ideal solutions
-        assert self.is_benefit_criteria is not None, 'Decision cannot be made with undefined criteria weights'
+        assert self._criteria_types is not None, 'Decision cannot be made with undefined criteria types'
         self._define_artificial_ideal_alternatives()
 
         # 4. Calculate separation measures
@@ -46,25 +46,27 @@ class TopsisDecisionMaker(IDecisionMaker):
         return np.column_stack((indexes, values))[::-1, :]
 
     def _define_artificial_ideal_alternatives(self):
-        all_maximums = np.amax(self._decision_matrix.get_weighted(), axis=0)
-        all_minimums = np.amin(self._decision_matrix.get_weighted(), axis=0)
+        decision_matrix = self.get_first_decision_matrix()
+        all_maximums = np.amax(decision_matrix.get_weighted(), axis=0)
+        all_minimums = np.amin(decision_matrix.get_weighted(), axis=0)
 
         ideal_alternative = []
-        for index, is_benefit in enumerate(self.is_benefit_criteria):
+        for index, is_benefit in enumerate(self._criteria_types):
             base_array = all_maximums if is_benefit else all_minimums
             ideal_alternative.append(base_array[index])
 
         self._artificial_ideal_alternative = np.array(ideal_alternative)
 
         ideal_negative_alternative = []
-        for index, is_benefit in enumerate(self.is_benefit_criteria):
+        for index, is_benefit in enumerate(self._criteria_types):
             base_array = all_minimums if is_benefit else all_maximums
             ideal_negative_alternative.append(base_array[index])
 
         self._artificial_ideal_negative_alternative = np.array(ideal_negative_alternative)
 
     def _define_separation_measures(self):
-        weighted_dm = self._decision_matrix.get_weighted()
+        decision_matrix = self.get_first_decision_matrix()
+        weighted_dm = decision_matrix.get_weighted()
 
         def calculate_distance(matrix, vector):
             return np.around(np.sqrt(np.sum((matrix - vector) ** 2, axis=1)), decimals=4)

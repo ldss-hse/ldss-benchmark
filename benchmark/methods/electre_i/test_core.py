@@ -1,17 +1,16 @@
 # pylint: disable=too-many-locals
 import numpy as np
 
-from benchmark.assessments.decision_matrix import DecisionMatrix, DecisionMatrixFactory
+from benchmark.constants import TASKS_ROOT
 from benchmark.methods.electre_i.core import ElectreDecisionMaker
+from benchmark.task.task_model import TaskModelFactory
 
 
 def test_ideal_alternatives():
-    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
-    decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(decision_matrix)
-    criteria_weights = (.2, .1, .1, .1, .2, .3)
-    alternatives_type = (True, True, True, False, True, True)
-    decision_maker.set_criteria_weights(criteria_weights)
-    decision_maker.set_alternatives_type(alternatives_type)
+    path_to_task = TASKS_ROOT / '1_aircraft' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+
+    decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(task)
 
     # in the original book example seems to contain errors during normalization. However,
     # in order to follow other computations we need to keep their normalized matrix
@@ -21,7 +20,7 @@ def test_ideal_alternatives():
         [.4204, .4882, .5308, .4143, .6736, .5217],
         [.5139, .4392, .5056, .4603, .4811, .3727],
     ]
-    decision_matrix._normalized = np.array(their_normalized)
+    decision_maker.get_first_decision_matrix()._normalized = np.array(their_normalized)
 
     res = decision_maker.run()
 

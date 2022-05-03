@@ -4,19 +4,17 @@ TOPSIS implementation based on https://link.springer.com/book/10.1007/978-3-642-
 Ching-Lai Hwang, Kwangsun Yoon. Multiple Attribute Decision Making Methods and Applications.
 A State-of-the-Art Survey.
 """
-
-from benchmark.assessments.decision_matrix import DecisionMatrixFactory, DecisionMatrix
+from benchmark.constants import TASKS_ROOT
 from benchmark.methods.topsis.core import TopsisDecisionMaker
+from benchmark.task.task_model import TaskModelFactory
 
 
 def main():
     print('Running TOPSIS method')
-    decision_matrix: DecisionMatrix = DecisionMatrixFactory.from_book_aircraft_example()
-    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(decision_matrix)
-    criteria_weights = (.2, .1, .1, .1, .2, .3)
-    alternatives_type = (True, True, True, False, True, True)
-    decision_maker.set_criteria_weights(criteria_weights)
-    decision_maker.set_alternatives_type(alternatives_type)
+    path_to_task = TASKS_ROOT / '1_aircraft' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+
+    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(task)
 
     res = decision_maker.run()
 
