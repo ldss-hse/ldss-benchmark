@@ -18,8 +18,9 @@ class TaskModel:
     _alternatives: Alternatives
     _decision_matrices: dict[str, DecisionMatrix]
 
-    def __init__(self, dto):
+    def __init__(self, dto: TaskDTOScheme, json_path: Path):
         self._dto = dto
+        self._json_path = json_path
         self._criteria = Criteria(self._dto)
         self._scales = Scales(self._dto)
         self._alternatives = Alternatives(self._dto)
@@ -28,6 +29,10 @@ class TaskModel:
     @property
     def decision_matrices(self):
         return self._decision_matrices
+
+    @property
+    def json_path(self):
+        return self._json_path
 
     def extract_raw_decision_matrices(self):
         raw_matrices = self._load_raw_decision_matrices_from_dto()
@@ -90,10 +95,11 @@ class TaskModel:
     def num_alternatives(self):
         return len(self._alternatives)
 
+
 class TaskModelFactory:
     def from_json(self, json_path: Path) -> TaskModel:
         with json_path.open(encoding='utf-8') as task_file:
             task_raw = task_file.read()
         # pylint: disable=no-member
         task_parsed = TaskDTOScheme.__pydantic_model__.parse_raw(task_raw)
-        return TaskModel(task_parsed)
+        return TaskModel(task_parsed, json_path)

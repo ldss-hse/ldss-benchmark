@@ -130,3 +130,7 @@ dmypy.json
 
 # IDEA
 .idea
+
+# Project generated
+artifacts
+benchmark/methods/ml_ldm/scripts/bin
