@@ -34,7 +34,7 @@ def generate_tasks(experiment_tasks_path):
     for alt_index, num_alternatives in enumerate(alternatives_range):
         for criteria_idx, num_criteria in enumerate(criteria_range):
             for _ in range(number_of_replications_of_each_set):
-                print(f'Generating task no. {task_id+1}...', end=' ')
+                print(f'Generating task no. {task_id + 1}...', end=' ')
                 generator = SingleTaskGenerator(num_experts=num_experts,
                                                 num_alternatives=num_alternatives,
                                                 num_criteria_groups=num_criteria_groups,
@@ -49,19 +49,7 @@ def generate_tasks(experiment_tasks_path):
                 task_id += 1
 
 
-def main():
-    print('Running Experiment no. 1: only numeric assessments, single expert')
-    GENERATE_NEW_DATASET = False
-
-    experiment_root_path = GENERATED_TASKS_PATH / 'experiment_1'
-    experiment_reports_path = experiment_root_path / 'reports'
-    experiment_tasks_path = experiment_root_path / 'tasks'
-    experiment_reports_path.mkdir(parents=True, exist_ok=True)
-
-    if GENERATE_NEW_DATASET:
-        shutil.rmtree(experiment_tasks_path)
-        generate_tasks(experiment_tasks_path)
-
+def collect_decision_makers_reports(experiment_tasks_path, experiment_reports_path):
     decision_makers = {
         'ML-LDM': MLLDMDecisionMaker,
         'ELECTRE I': ElectreDecisionMaker,
@@ -70,7 +58,7 @@ def main():
     all_files = sorted(experiment_tasks_path.glob('*.json'), key=lambda f: int(f.stem.split('_')[-1]))
     num_files = len(all_files)
     for file_idx, file_path in enumerate(all_files):
-        print(f'{file_idx+1}/{num_files} Processing {file_path}...', end=' ')
+        print(f'{file_idx + 1}/{num_files} Processing {file_path}...', end=' ')
 
         task_id = int(file_path.stem.split('_')[-1])
         report_path = experiment_reports_path / f'report_{task_id}.json'
@@ -93,6 +81,52 @@ def main():
             json.dump(report, json_file, indent=4)
 
         print('done.')
+
+
+def main():
+    print('Running Experiment no. 1: only numeric assessments, single expert')
+    GENERATE_NEW_DATASET = False
+    COLLECT_DECISION_MAKING_REPORTS = True
+
+    experiment_root_path = GENERATED_TASKS_PATH / 'experiment_1'
+    experiment_reports_path = experiment_root_path / 'reports'
+    experiment_tasks_path = experiment_root_path / 'tasks'
+    experiment_reports_path.mkdir(parents=True, exist_ok=True)
+
+    if GENERATE_NEW_DATASET:
+        shutil.rmtree(experiment_tasks_path)
+        generate_tasks(experiment_tasks_path)
+
+    if COLLECT_DECISION_MAKING_REPORTS:
+        collect_decision_makers_reports(experiment_tasks_path, experiment_reports_path)
+
+    full_report = []
+    all_files = sorted(experiment_reports_path.glob('*.json'), key=lambda f: int(f.stem.split('_')[-1]))
+    num_files = len(all_files)
+    for file_idx, file_path in enumerate(all_files):
+        print(f'{file_idx + 1}/{num_files} Processing {file_path}...', end=' ')
+
+        with file_path.open(encoding='utf-8') as json_file:
+            data = json.load(json_file)
+
+        num_alternatives = data['task_info']['num_alternatives']
+        num_criteria = data['task_info']['num_criteria']
+        num_experts = data['task_info']['num_experts']
+        num_criteria_groups = data['task_info']['num_criteria_groups']
+
+        def find_existing_collection(x):
+            return x['info'] == data['task_info']
+
+        existing_collection = list(filter(find_existing_collection, full_report))
+        if not existing_collection:
+            full_report.append({'info': data['task_info'], 'data': {'ML-LDM':[], 'ELECTRE I': [], 'TOPSIS': []}})
+        existing_collection = list(filter(find_existing_collection, full_report))[0]
+
+        existing_collection['data']['ML-LDM'].append(data['ML-LDM'])
+        existing_collection['data']['ELECTRE I'].append(data['ELECTRE I'])
+        existing_collection['data']['TOPSIS'].append(data['TOPSIS'])
+
+    print(full_report)
 
 
 if __name__ == '__main__':
