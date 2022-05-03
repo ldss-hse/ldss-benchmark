@@ -80,13 +80,14 @@ def main():
             continue
 
         task = TaskModelFactory().from_json(file_path)
-        report = {}
+        report = {
+            'task_info': task.report,
+        }
         for decision_method_name, decision_maker_class in decision_makers.items():
             decision_maker = decision_maker_class(task)
             res = decision_maker.run()
 
             report[decision_method_name] = np.array(res[:, 0], dtype=int).tolist()
-
 
         with report_path.open('w', encoding='utf-8') as json_file:
             json.dump(report, json_file, indent=4)

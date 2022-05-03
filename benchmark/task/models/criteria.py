@@ -26,3 +26,6 @@ class Criteria:
                 self.criteria_full[criterion_index] = criterion_info
                 self.criteria_types.append(criterion_info.benefit)
                 criterion_index += 1
+
+    def __len__(self):
+        return len(self.criterion_to_index)
