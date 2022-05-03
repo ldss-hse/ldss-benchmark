@@ -65,17 +65,16 @@ def _run_jar(scripts_path: Path, job_artifacts_path: Path, task_json_path: Path)
         '-INPUT_JSON', str(task_json_path),
         '-OUTPUT_DIR', str(job_artifacts_path)
     ]
-    res_process = _run_console_tool(tool_path, *arguments, exe=exe, debug=True)
+    res_process = _run_console_tool(tool_path, *arguments, exe=exe, debug=False)
     stdout = str(res_process.stdout.decode("utf-8"))
-    print(f'SUBPROCESS: {stdout}')
-    print(f'SUBPROCESS: {str(res_process.stderr.decode("utf-8"))}')
+    # print(f'SUBPROCESS: {stdout}')
+    # print(f'SUBPROCESS: {str(res_process.stderr.decode("utf-8"))}')
 
     if res_process.returncode != 0 or '[ERROR] ' in stdout:
         raise DecisionMakerCrashedError('Decision Maker did not finish successfully')
 
 
 def parse_results(json_path: Path):
-    print('In parsing results')
     with json_path.open(encoding='utf-8') as file:
         res = json.load(file)
     return res

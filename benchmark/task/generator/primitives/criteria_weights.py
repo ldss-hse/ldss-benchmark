@@ -10,8 +10,10 @@ def generate_criteria_weights(criteria: dict[str, list[CriterionDescription]], n
     for criteria_group in criteria.keys():
         random_numbers = np.random.randint(0, 10, num_criteria_per_group)
         total = np.sum(random_numbers)
-        unified = list(random_numbers / total)
+        unified = [round(i, 1) for i in random_numbers / total]
+        before = unified.copy()
+        unified[-1] = 1 - sum(unified[:-1])
 
-        assert sum(unified) == 1, f'Sum of weights should equal to 1. Current: {unified}'
+        assert sum(unified) == 1, f'Sum of weights should equal to 1. Before: {before}. Current: {unified}'
         weights_per_group[criteria_group] = unified
     return weights_per_group
