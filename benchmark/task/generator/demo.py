@@ -1,0 +1,26 @@
+import json
+
+from pydantic.json import pydantic_encoder
+
+from benchmark.constants import ARTIFACTS_PATH, GENERATED_TASKS_PATH
+from benchmark.task.generator.dumper import save_to_json
+from benchmark.task.generator.single_task_generator import SingleTaskGenerator
+from benchmark.task.generator.task_type import TaskType
+from benchmark.task.schemas.task_scheme import TaskDTOScheme
+
+
+def main():
+    generator = SingleTaskGenerator(num_experts=1,
+                                    num_alternatives=4,
+                                    num_criteria_groups=1,
+                                    num_criteria_per_group=6,
+                                    task_type=TaskType.NUMERIC_ONLY)
+    res_dto: TaskDTOScheme = generator.run()
+
+    path = GENERATED_TASKS_PATH / 'gen_task_1.json'
+    GENERATED_TASKS_PATH.mkdir(exist_ok=True, parents=True)
+    save_to_json(path, res_dto)
+
+
+if __name__ == '__main__':
+    main()

@@ -84,7 +84,7 @@ def parse_results(json_path: Path):
 def run_decision_maker(task_id: int, task_json_path: Path):
     parent_path = Path(__file__).parent
     scripts_path = parent_path / 'scripts'
-    job_artifacts_path = ARTIFACTS_PATH / str(task_id)
+    job_artifacts_path = ARTIFACTS_PATH / 'ml_ldm_internals' / str(task_id)
 
     _run_jar(scripts_path=scripts_path, job_artifacts_path=job_artifacts_path, task_json_path=task_json_path)
 
