@@ -22,9 +22,9 @@ class MLLDMDecisionMaker(IDecisionMaker):
         jar_path = jar_folder / 'lingvo-dss-all.jar'
 
         if not jar_path.exists():
-            print(f'Binary JAR for ML-LDM is not present on this machine. Installing it first...')
+            print('Binary JAR for ML-LDM is not present on this machine. Installing it first...')
             wget.download(ML_LDM_JAR_RELEASE_LINK, str(jar_path))
-            print(f'Installed!')
+            print('Installed!')
 
         task_result_raw = run_decision_maker(artifact_id, self._task.json_path)
 

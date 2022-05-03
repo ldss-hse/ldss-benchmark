@@ -1,3 +1,4 @@
+# pylint: disable=invalid-name
 from typing import List, Dict
 
 from pydantic import Field
@@ -15,6 +16,7 @@ class ResultAlternativeAssessmentDescription:
                                title='ID of alternative')
     estimation: List[Dict[str, float]] = Field(...,
                                                title='Aggregated assessment')
+
 
 @dataclass
 class MLLDMTaskResultDTOScheme:

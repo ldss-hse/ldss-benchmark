@@ -12,20 +12,20 @@ class DecisionMakerCrashedError(Exception):
 
 
 class CLIExecutableEnum(enum.Enum):
-    bash = 1
-    powershell = 2
-    python = 3
+    BASH = 1
+    POWERSHELL = 2
+    PYTHON = 3
 
     def __str__(self):
         mapping = {
-            CLIExecutableEnum.bash: 'bash',
-            CLIExecutableEnum.python: 'python',
-            CLIExecutableEnum.powershell: 'Powershell.exe',
+            CLIExecutableEnum.BASH: 'bash',
+            CLIExecutableEnum.PYTHON: 'python',
+            CLIExecutableEnum.POWERSHELL: 'Powershell.exe',
         }
         return mapping[self]
 
 
-def _run_console_tool(tool_path: Path, exe: CLIExecutableEnum = CLIExecutableEnum.bash, *args, **kwargs):
+def _run_console_tool(tool_path: Path, *args, exe: CLIExecutableEnum = CLIExecutableEnum.BASH, **kwargs):
     kwargs_processed = []
     for item in kwargs.items():
         if item[0] in ('env', 'debug'):
@@ -33,7 +33,7 @@ def _run_console_tool(tool_path: Path, exe: CLIExecutableEnum = CLIExecutableEnu
         kwargs_processed.extend(map(str, item))
 
     options = [str(exe)]
-    if exe is CLIExecutableEnum.powershell:
+    if exe is CLIExecutableEnum.POWERSHELL:
         options.append('-File')
 
     options.extend([
@@ -46,17 +46,17 @@ def _run_console_tool(tool_path: Path, exe: CLIExecutableEnum = CLIExecutableEnu
         print(f'Attempting to run with the following arguments: {" ".join(options)}')
 
     if kwargs.get('env'):
-        return subprocess.run(options, capture_output=True, env=kwargs.get('env'))
-    return subprocess.run(options, capture_output=True)
+        return subprocess.run(options, capture_output=True, env=kwargs.get('env'), check=True)
+    return subprocess.run(options, capture_output=True, check=True)
 
 
 def _run_jar(scripts_path: Path, job_artifacts_path: Path, task_json_path: Path):
     if platform.system() == 'Windows':
         tool_path = scripts_path / 'run_decision_maker.ps1'
-        exe = CLIExecutableEnum.powershell
+        exe = CLIExecutableEnum.POWERSHELL
     else:
         tool_path = scripts_path / 'run_decision_maker.sh'
-        exe = CLIExecutableEnum.bash
+        exe = CLIExecutableEnum.BASH
 
     jar_path = scripts_path / 'bin' / 'lingvo-dss-all.jar'
 
@@ -65,7 +65,7 @@ def _run_jar(scripts_path: Path, job_artifacts_path: Path, task_json_path: Path)
         '-INPUT_JSON', str(task_json_path),
         '-OUTPUT_DIR', str(job_artifacts_path)
     ]
-    res_process = _run_console_tool(tool_path, exe, *arguments, debug=True)
+    res_process = _run_console_tool(tool_path, *arguments, exe=exe, debug=True)
     stdout = str(res_process.stdout.decode("utf-8"))
     print(f'SUBPROCESS: {stdout}')
     print(f'SUBPROCESS: {str(res_process.stderr.decode("utf-8"))}')
