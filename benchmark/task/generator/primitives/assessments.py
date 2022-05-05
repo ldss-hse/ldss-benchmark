@@ -34,7 +34,7 @@ def generate_assessments(criteria, alternatives, experts, scales, task_type: Tas
                         value = random.choice(scale.labels)
                     elif not criterion_info.qualitative:
                         if numeric_criteria_seeds.get(criterion_info.criteriaID) is None:
-                            random_seed = random.randint(1, 5) * 10 * random.randint(1, 3)
+                            random_seed = random.randint(1, 5) * (10 ** random.randint(1, 3))
                             numeric_criteria_seeds[criterion_info.criteriaID] = random_seed
                         random_seed = numeric_criteria_seeds[criterion_info.criteriaID]
                         scale_id = None

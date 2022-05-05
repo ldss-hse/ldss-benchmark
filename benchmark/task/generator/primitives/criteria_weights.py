@@ -14,6 +14,9 @@ def generate_criteria_weights(criteria: dict[str, list[CriterionDescription]], n
         before = unified.copy()
         unified[-1] = 1 - sum(unified[:-1])
 
-        assert sum(unified) == 1, f'Sum of weights should equal to 1. Before: {before}. Current: {unified}'
+        if 0. in unified:
+            unified = [1 / num_criteria_per_group for _ in range(num_criteria_per_group)]
+
+        assert abs(1 - sum(unified)) < 0.001, f'Sum of weights should equal to 1. Before: {before}. Current: {unified}'
         weights_per_group[criteria_group] = unified
     return weights_per_group
