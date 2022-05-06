@@ -26,9 +26,13 @@ def main():
     experiment_root_path = GENERATED_TASKS_PATH / 'experiment_1'
     experiment_reports_path = experiment_root_path / 'reports'
     experiment_tasks_path = experiment_root_path / 'tasks'
-    correlation_report_path = experiment_root_path / 'full_report.json'
+    correlation_report_dir_path = experiment_root_path / 'report'
+    correlation_report_path = correlation_report_dir_path / 'full_report.json'
+    experiment_visualization_path = correlation_report_dir_path / 'visualization'
     experiments_settings_path = experiment_root_path / 'meta.json'
     experiment_reports_path.mkdir(parents=True, exist_ok=True)
+    correlation_report_dir_path.mkdir(parents=True, exist_ok=True)
+    experiment_visualization_path.mkdir(parents=True, exist_ok=True)
 
     if generate_new_dataset:
         shutil.rmtree(experiment_tasks_path, ignore_errors=True)
@@ -44,7 +48,6 @@ def main():
 
         save_to_json(correlation_report_path, correlation_report.dto)
 
-    experiment_visualization_path = experiment_root_path / 'visualization'
     visualize_correlation_report(correlation_report_path, experiment_visualization_path)
 
 

@@ -1,8 +1,13 @@
-import itertools
+import enum
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import os
+
+import numpy as np
 import pandas as pd
+
+from benchmark.comparison.enums import StatisticsNames
 
 
 def get_img_folder_path():
@@ -11,87 +16,86 @@ def get_img_folder_path():
     return tmp_artifacts_root
 
 
-def create_chart(task, comparison_criteria, nn_data, numpy_data, scipy_data, language='ru'):
+class Language(str, enum.Enum):
+    ENGLIGH = 'ENGLISH'
+    RUSSIAN = 'RUSSIAN'
+
+    def __str__(self):
+        return self.value
+
+
+class ChartConfig:
+    language: Language
+    coefficient_type: StatisticsNames
     font_settings = {
         'fontname': 'Times New Roman',
         'fontsize': 12
     }
+    x_title_type: str
+    title: str
+    file_format: str
 
+    def __init__(self, language: Language, coefficient_type: StatisticsNames, font_settings: Optional[dict],
+                 x_title_type: str,
+                 title: str, file_format: str = 'png'):
+        self.language = language
+        self.coefficient_type = coefficient_type
+        if font_settings is not None:
+            self.font_settings |= font_settings
+        self.x_title_type = x_title_type
+        self.title = title
+        self.file_format = file_format
+
+
+def create_chart(labels: list[str], rows: dict[str, np.ndarray], config: ChartConfig):
     i8n_mapping = {
-        'memory': {
-            'ru': 'Использованная память, Мбайт',
-            'en': 'Peak memory, Mb'
+        StatisticsNames.SPEARMAN_RHO: {
+            Language.RUSSIAN: 'Среднее значение rho',
+            Language.ENGLIGH: 'Mean of rho'
         },
-        'time': {
-            'ru': 'Время выполнения, сек',
-            'en': 'Time elapsed, sec'
+        StatisticsNames.KENDALL_TAU: {
+            Language.RUSSIAN: 'Среднее значение tau',
+            Language.ENGLIGH: 'Mean of tau'
         },
-        'x_axis': {
-            'ru': 'Глубина структуры',
-            'en': 'Tree depth'
+        'alternatives': {
+            Language.RUSSIAN: 'Количество альтернатив',
+            Language.ENGLIGH: 'Number of alternatives',
+        },
+        'criteria': {
+            Language.RUSSIAN: 'Пары сравниваемых методов',
+            Language.ENGLIGH: 'Methods',
         }
     }
 
-    sample_ticks = scipy_data['depth'].tolist()
-    if comparison_criteria == 'memory':
-        y_title = i8n_mapping['memory'][language]
+    y_title = i8n_mapping[config.coefficient_type][config.language]
 
-        filtered_data_df = pd.DataFrame({
-            'x': sample_ticks,
-            'nn': nn_data[f'{task}_FINISH'] - nn_data[f'{task}_START'],
-            'numpy': numpy_data[f'{task}_FINISH'] - numpy_data[f'{task}_START'],
-            'scipy': scipy_data[f'{task}_FINISH'] - scipy_data[f'{task}_START'],
-        })
-    else:  # it is time
-        y_title = i8n_mapping['time'][language]
+    filtered_data_df = pd.DataFrame({
+        'x': labels,
+        **rows
+    })
 
-        filtered_data_df = pd.DataFrame({
-            'x': sample_ticks,
-            'nn': nn_data[f'{task}_time'],
-            'numpy': numpy_data[f'{task}_time'],
-            'scipy': scipy_data[f'{task}_time'],
-        })
     plt.close()
-    plt.plot('x', 'nn', data=filtered_data_df, marker='o', color='black',
-             linewidth=2, label='Keras')
-    plt.plot('x', 'numpy', data=filtered_data_df, marker='s', color='black',
-             linestyle='dashed', linewidth=2, label='NumPy')
-    plt.plot('x', 'scipy', data=filtered_data_df, marker='^', color='black',
-             linestyle='dotted', linewidth=2, label='SciPy')
-    plt.yscale('log')
-    plt.ylabel(y_title, **font_settings)
-    plt.xlabel(i8n_mapping['x_axis'][language], **font_settings)
-    plt.xticks(sample_ticks, **font_settings)
-    plt.yticks(**font_settings)
 
-    # task_title = f'{task.title()} task'
-    # task_title = 'Задача кодирования структуры' if task == 'encode' else 'Задача декодирования структуры'
-    # plt.title(task_title)
+    markers = ['o', 's', '^', 'v']
+    line_styles = ['solid', 'dotted', 'dashed', 'dashdot']
+    for idx, (key, values) in enumerate(rows.items()):
+        plt.plot(filtered_data_df['x'], filtered_data_df[key], marker=markers[idx], color='black',
+                 linewidth=2, linestyle=line_styles[idx], label=key)
+
+    plt.ylim(-1, 1.2)
+    plt.ylabel(y_title, **config.font_settings)
+    plt.xlabel(i8n_mapping[config.x_title_type][config.language], **config.font_settings)
+
+    plt.xticks(labels, **config.font_settings)
+    plt.yticks(**config.font_settings)
+
+    plt.title(config.title)
     plt.legend()
+    # plt.show()
+
     return plt
 
 
-def save_chart(plot, task, comparison_criteria, language='ru'):
-    path_template = os.path.join(get_img_folder_path(), f'{task}_{comparison_criteria}_{language}.{{}}')
-    os.makedirs(get_img_folder_path(), exist_ok=True)
-    plot.savefig(path_template.format('eps'), format='eps', dpi=600)
-
-
-def main():
-    nn_df = pd.read_csv('./data/test_nn.csv', dtype={'depth': 'int16'})
-    numpy_df = pd.read_csv('./data/test_numpy.csv', dtype={'depth': 'int16'})
-    scipy_df = pd.read_csv('./data/test_scipy.csv', dtype={'depth': 'int16'})
-
-    language = 'ru'
-    for task, criteria in itertools.product(('encode', 'decode'), ('memory', 'time')):
-        plot = create_chart(task=task,
-                            comparison_criteria=criteria,
-                            nn_data=nn_df,
-                            numpy_data=numpy_df,
-                            scipy_data=scipy_df,
-                            language=language)
-        save_chart(plot, task=task, comparison_criteria=criteria, language=language)
-
-
-if __name__ == '__main__':
-    main()
+def save_chart(plot, artifacts_path, file_name, config: ChartConfig):
+    path_template = artifacts_path / f'{file_name}_{str(config.language)}.{config.file_format}'
+    plot.savefig(path_template, format=config.file_format, dpi=600)
