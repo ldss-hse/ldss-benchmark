@@ -111,7 +111,7 @@ class CorrelationReport:
         all_files = sorted(self._report_directory_path.glob('*.json'), key=lambda f: int(f.stem.split('_')[-1]))
         num_files = len(all_files)
         for file_idx, file_path in enumerate(all_files):
-            print(f'{file_idx + 1}/{num_files} Processing {file_path}...', end=' ')
+            print(f'{file_idx + 1}/{num_files} Loading report for correlation analysis from {file_path}...', end=' ')
 
             with file_path.open(encoding='utf-8') as json_file:
                 data = json.load(json_file)
@@ -127,6 +127,8 @@ class CorrelationReport:
             unique_setup.add_new_data(MethodsNames.ML_LDM, data[str(MethodsNames.ML_LDM)])
             unique_setup.add_new_data(MethodsNames.ELECTRE_I, data[str(MethodsNames.ELECTRE_I)])
             unique_setup.add_new_data(MethodsNames.TOPSIS, data[str(MethodsNames.TOPSIS)])
+
+            print('done.')
 
     def calculate_correlation(self):
         for unique_combination in self._unique_combinations:

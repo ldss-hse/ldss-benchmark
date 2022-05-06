@@ -19,9 +19,9 @@ def main():
     print('Running Experiment no. 1: only numeric assessments, single expert')
     generate_new_dataset = False
     execute_decision_makers = False
-    calculate_correlation_reports = False
+    calculate_correlation_reports = True
     task_type = TaskType.NUMERIC_ONLY
-    num_replicas = 2
+    num_replicas = 100
 
     experiment_root_path = GENERATED_TASKS_PATH / 'experiment_1'
     experiment_reports_path = experiment_root_path / 'reports'

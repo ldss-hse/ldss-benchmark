@@ -18,7 +18,7 @@ def run_decision_makers(experiment_tasks_path, experiment_reports_path):
     all_files = sorted(experiment_tasks_path.glob('*.json'), key=lambda f: int(f.stem.split('_')[-1]))
     num_files = len(all_files)
     for file_idx, file_path in enumerate(all_files):
-        print(f'{file_idx + 1}/{num_files} Processing {file_path}...', end=' ')
+        print(f'{file_idx + 1}/{num_files} Running all decision makers for task from {file_path}...', end=' ')
 
         task_id = int(file_path.stem.split('_')[-1])
         report_path = experiment_reports_path / f'report_{task_id}.json'
