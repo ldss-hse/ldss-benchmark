@@ -96,7 +96,10 @@ class ElectreDecisionMaker(IDecisionMaker):
                 if k_index == l_index:
                     continue
                 criteria_indexes = np.array(list(self._concordance[(k_index, l_index)]))
-                weights = np.array(self._criteria_weights).take(criteria_indexes)
+                if criteria_indexes.size == 0:
+                    weights = np.array(())
+                else:
+                    weights = np.array(self._criteria_weights).take(criteria_indexes)
                 concordance_index = np.sum(weights) / np.sum(self._criteria_weights)
                 self._concordance_matrix[k_index][l_index] = concordance_index
 
@@ -112,7 +115,10 @@ class ElectreDecisionMaker(IDecisionMaker):
                 discordance_indexes = self._discordance[(k_index, l_index)]
                 k_selected_values = decision_matrix[k_index].take(list(discordance_indexes))
                 l_selected_values = decision_matrix[l_index].take(list(discordance_indexes))
-                discordance_max = np.max(np.abs(k_selected_values - l_selected_values))
+                if k_selected_values.size == 0 or l_selected_values.size == 0:
+                    discordance_max = 0.
+                else:
+                    discordance_max = np.max(np.abs(k_selected_values - l_selected_values))
                 overall_max = np.max(np.abs(decision_matrix[k_index] - decision_matrix[l_index]))
 
                 self._discordance_matrix[k_index][l_index] = discordance_max / overall_max

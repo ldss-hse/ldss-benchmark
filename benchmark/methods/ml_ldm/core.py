@@ -14,7 +14,7 @@ from benchmark.methods.ml_ldm.run_jar import run_decision_maker
 class MLLDMDecisionMaker(IDecisionMaker):
     def run(self):
         artifact_id = random.randrange(1000)
-        print(f'ML-LDM artifact id: {artifact_id}')
+        # print(f'ML-LDM artifact id: {artifact_id}')
 
         jar_folder = Path(__file__).parent / 'scripts' / 'bin'
         jar_folder.mkdir(parents=True, exist_ok=True)

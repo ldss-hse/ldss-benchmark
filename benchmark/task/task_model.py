@@ -34,6 +34,15 @@ class TaskModel:
     def json_path(self):
         return self._json_path
 
+    @property
+    def report(self):
+        return {
+            'num_alternatives': self.num_alternatives,
+            'num_criteria': len(self._criteria),
+            'num_experts': len(self._dto.experts),
+            'num_criteria_groups': len(self._dto.criteria),
+        }
+
     def extract_raw_decision_matrices(self):
         raw_matrices = self._load_raw_decision_matrices_from_dto()
         return self._unify_decision_matrices(raw_matrices)
