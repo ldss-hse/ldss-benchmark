@@ -28,6 +28,9 @@ class TopsisDecisionMaker(IDecisionMaker):
         assert self._criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
         self._apply_criteria_weights()
 
+        assert len(self._decision_matrices) == 1, 'Even if there were several experts, their assessments should be' \
+                                                  'consolidated before TOPSIS starts generating recommendations'
+
         # 3. Determine ideal and negative-ideal solutions
         assert self._criteria_types is not None, 'Decision cannot be made with undefined criteria types'
         self._define_artificial_ideal_alternatives()

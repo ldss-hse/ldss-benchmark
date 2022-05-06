@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic.dataclasses import dataclass
 
 from benchmark.comparison.schemes.unique_experimental_setup import UniqueExperimentalSetupDTO
@@ -11,6 +13,10 @@ class ExperimentInfoDTO:
     criteria_range: list[int]
     num_experts: int
     num_criteria_groups: int
+    num_replicas: Optional[int]
+    generate_new_dataset: Optional[bool] = True
+    execute_decision_makers: Optional[bool] = True
+    calculate_correlation_reports: Optional[bool] = True
 
 
 @dataclass

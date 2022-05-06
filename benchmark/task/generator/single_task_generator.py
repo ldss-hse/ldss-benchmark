@@ -3,8 +3,8 @@ from benchmark.task.generator.primitives.abstraction_levels_weight import genera
 from benchmark.task.generator.primitives.alternatives import generate_alternatives
 from benchmark.task.generator.primitives.assessments import generate_assessments
 from benchmark.task.generator.primitives.criteria import generate_criteria
-from benchmark.task.generator.primitives.criteria_weights import generate_criteria_weights
-from benchmark.task.generator.primitives.expert_weights import generate_expert_weights
+from benchmark.task.generator.primitives.criteria_weights import generate_criteria_weights, generate_weights
+from benchmark.task.generator.primitives.expert_weights import generate_expert_weights_rule, generate_expert_weights
 from benchmark.task.generator.primitives.experts import generate_experts
 from benchmark.task.generator.primitives.scale import generate_scales
 from benchmark.task.generator.task_type import TaskType
@@ -34,13 +34,18 @@ class SingleTaskGenerator:
         scales = generate_scales(self._task_type)
         abstraction_levels = generate_abstraction_levels(self._num_criteria_groups)
         experts = generate_experts(self._num_experts)
+
+        # IMPORTANT: to this moment all experts have equal weights
+        experts_weights = generate_expert_weights(experts, all_equal=True)
+
         task_dto = TaskDTOScheme(criteria=criteria,
                                  criteriaWeightsPerGroup=criteria_weights,
                                  alternatives=alternatives,
                                  scales=scales,
                                  abstractionLevels=abstraction_levels,
                                  abstractionLevelWeights=generate_abstraction_level_weights(abstraction_levels),
-                                 expertWeightsRule=generate_expert_weights(),
+                                 expertWeightsRule=generate_expert_weights_rule(),
+                                 expertWeights=experts_weights,
                                  experts=experts,
                                  estimations=generate_assessments(criteria, alternatives, experts, scales,
                                                                   self._task_type))
