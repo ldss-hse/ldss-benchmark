@@ -1,8 +1,4 @@
-import json
-
-from pydantic.json import pydantic_encoder
-
-from benchmark.constants import ARTIFACTS_PATH, GENERATED_TASKS_PATH
+from benchmark.constants import GENERATED_TASKS_PATH
 from benchmark.task.generator.dumper import save_to_json
 from benchmark.task.generator.single_task_generator import SingleTaskGenerator
 from benchmark.task.generator.task_type import TaskType

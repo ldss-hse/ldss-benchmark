@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 
 from benchmark.task.schemas.task_scheme import CriterionDescription

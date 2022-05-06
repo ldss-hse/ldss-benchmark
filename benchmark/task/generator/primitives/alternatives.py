@@ -4,8 +4,8 @@ from benchmark.task.schemas.task_scheme import AlternativeDescription
 
 
 def _new_alternative(alternative_index, num_groups):
-    return AlternativeDescription(alternativeID=f'alternative_{alternative_index+1}',
-                                  alternativeName=f'Alternative {alternative_index+1} name',
+    return AlternativeDescription(alternativeID=f'alternative_{alternative_index + 1}',
+                                  alternativeName=f'Alternative {alternative_index + 1} name',
                                   abstractionLevelID=random.randint(0, num_groups))
 
 

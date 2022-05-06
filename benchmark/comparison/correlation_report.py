@@ -102,7 +102,7 @@ class CorrelationReport:
 
     def add_new_setup(self, json_dict):
         if self.find_existing_setup(json_dict):
-            return
+            return None
         new_setup = UniqueExperimentalSetup(json_dict['task_info'])
         self._unique_combinations.append(new_setup)
         return new_setup

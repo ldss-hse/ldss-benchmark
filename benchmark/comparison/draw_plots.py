@@ -1,8 +1,8 @@
 import enum
+import os
 from typing import Optional
 
 import matplotlib.pyplot as plt
-import os
 
 import numpy as np
 import pandas as pd
@@ -78,7 +78,7 @@ def create_chart(labels: list[str], rows: dict[str, np.ndarray], config: ChartCo
 
     markers = ['o', 's', '^', 'v']
     line_styles = ['solid', 'dotted', 'dashed', 'dashdot']
-    for idx, (key, values) in enumerate(rows.items()):
+    for idx, key in enumerate(rows.keys()):
         plt.plot(filtered_data_df['x'], filtered_data_df[key], marker=markers[idx], color='black',
                  linewidth=2, linestyle=line_styles[idx], label=key)
 

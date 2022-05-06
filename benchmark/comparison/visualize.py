@@ -1,7 +1,5 @@
-import enum
 from itertools import combinations
 from pathlib import Path
-from pprint import pprint
 
 import numpy as np
 
@@ -41,29 +39,29 @@ def compare_two_methods_by_alternatives(dto: CorrelationReportDTO, method_a: Met
     key_pair = two_methods_to_key(method_a, method_b)
     for alternatives_number in dto.experiment_info.alternatives_range:
         all_configurations_with_this_number = list(filter(
-            lambda x: x.setup_info.num_alternatives == alternatives_number,
+            lambda x, a=alternatives_number: x.setup_info.num_alternatives == a,
             dto.unique_configurations
         ))
 
         for criteria_number in dto.experiment_info.criteria_range:
             all_configurations_with_this_number_and_criteria = list(filter(
-                lambda x: x.setup_info.num_criteria == criteria_number,
+                lambda x, c=criteria_number: x.setup_info.num_criteria == c,
                 all_configurations_with_this_number
             ))
 
             num_experiments_with_different_criteria = len(all_configurations_with_this_number_and_criteria)
             assert num_experiments_with_different_criteria == 1, \
                 'Exactly one unique configuration for each criterion+alternative. Serious fault'
-            x = all_configurations_with_this_number_and_criteria[0]
+            element = all_configurations_with_this_number_and_criteria[0]
 
             if alternative_to_average.get(criteria_number) is None:
                 alternative_to_average[criteria_number] = {}
             if alternative_to_average[criteria_number].get(alternatives_number) is None:
                 alternative_to_average[criteria_number][alternatives_number] = {}
             alternative_to_average[criteria_number][alternatives_number][key_pair] = {
-                str(StatisticsNames.KENDALL_TAU): _get_correlation_coefficient(x, method_a, method_b,
+                str(StatisticsNames.KENDALL_TAU): _get_correlation_coefficient(element, method_a, method_b,
                                                                                StatisticsNames.KENDALL_TAU),
-                str(StatisticsNames.SPEARMAN_RHO): _get_correlation_coefficient(x, method_a, method_b,
+                str(StatisticsNames.SPEARMAN_RHO): _get_correlation_coefficient(element, method_a, method_b,
                                                                                 StatisticsNames.SPEARMAN_RHO),
             }
 
@@ -84,23 +82,23 @@ def compare_two_methods_by_criteria(dto, criteria_value: int = None):
         for alternatives_number in dto.experiment_info.alternatives_range:
 
             all_configurations_with_this_number_and_alternatives = list(filter(
-                lambda x: x.setup_info.num_alternatives == alternatives_number,
+                lambda x, a=alternatives_number: x.setup_info.num_alternatives == a,
                 all_configurations_with_this_number
             ))
 
             num_experiments_with_different_alternatives = len(all_configurations_with_this_number_and_alternatives)
             assert num_experiments_with_different_alternatives == 1, \
                 'Exactly one unique configuration for each criterion+alternative. Serious fault'
-            x = all_configurations_with_this_number_and_alternatives[0]
+            element = all_configurations_with_this_number_and_alternatives[0]
 
             if criteria_to_average.get(criteria_value) is None:
                 criteria_to_average[criteria_value] = {}
             if criteria_to_average[criteria_value].get(alternatives_number) is None:
                 criteria_to_average[criteria_value][alternatives_number] = {}
             criteria_to_average[criteria_value][alternatives_number][key_pair] = {
-                str(StatisticsNames.KENDALL_TAU): _get_correlation_coefficient(x, method_a, method_b,
+                str(StatisticsNames.KENDALL_TAU): _get_correlation_coefficient(element, method_a, method_b,
                                                                                StatisticsNames.KENDALL_TAU),
-                str(StatisticsNames.SPEARMAN_RHO): _get_correlation_coefficient(x, method_a, method_b,
+                str(StatisticsNames.SPEARMAN_RHO): _get_correlation_coefficient(element, method_a, method_b,
                                                                                 StatisticsNames.SPEARMAN_RHO),
             }
 

@@ -17,8 +17,8 @@ def generate_tasks(experiment_tasks_path, task_type: TaskType, experiments_setti
     experiment_tasks_path.mkdir(parents=True, exist_ok=True)
 
     task_id = 0
-    for alt_index, num_alternatives in enumerate(alternatives_range):
-        for criteria_idx, num_criteria in enumerate(criteria_range):
+    for _, num_alternatives in enumerate(alternatives_range):
+        for _, num_criteria in enumerate(criteria_range):
             for _ in range(number_of_replications_of_each_set):
                 print(f'Generating task no. {task_id + 1}...', end=' ')
                 generator = SingleTaskGenerator(num_experts=num_experts,

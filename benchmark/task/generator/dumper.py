@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+# pylint: disable=no-name-in-module
 from pydantic.json import pydantic_encoder
 
 from benchmark.task.schemas.task_scheme import TaskDTOScheme

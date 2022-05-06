@@ -37,6 +37,7 @@ def run_decision_makers(experiment_tasks_path, experiment_reports_path):
             decision_maker = decision_maker_class(task)
             try:
                 res = decision_maker.run()
+            # pylint: disable=broad-except
             except Exception:
                 is_failed = True
                 reason = decision_method_name

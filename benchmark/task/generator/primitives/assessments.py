@@ -23,7 +23,8 @@ def generate_assessments(criteria, alternatives, experts, scales, task_type: Tas
 
                     if criterion_info.qualitative and task_type is TaskType.NUMERIC_ONLY:
                         raise ValueError('unable to create linguistic variables for numeric only tasks')
-                    elif criterion_info.qualitative and task_type is TaskType.HYBRID_CRISP_LINGUISTIC:
+
+                    if criterion_info.qualitative and task_type is TaskType.HYBRID_CRISP_LINGUISTIC:
                         # IMPORTANT: hardcoded value of crisp scale as it is the only one to the moment
                         scale: ScalesDescription = list(filter(lambda x: x.scaleID == 's5', scales))[0]
                         scale_id = scale.scaleID

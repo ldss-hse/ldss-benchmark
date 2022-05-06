@@ -1,4 +1,4 @@
-from benchmark.constants import ARTIFACTS_PATH, GENERATED_TASKS_PATH
+from benchmark.constants import ARTIFACTS_PATH
 from benchmark.methods.electre_i.core import ElectreDecisionMaker
 from benchmark.methods.ml_ldm.core import MLLDMDecisionMaker
 from benchmark.methods.topsis.core import TopsisDecisionMaker

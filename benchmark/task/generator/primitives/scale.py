@@ -45,3 +45,5 @@ def generate_scales(task_type: TaskType):
         scales.append(_new_scale(5))
         scales.append(_new_scale(9))
         return scales
+
+    return None
