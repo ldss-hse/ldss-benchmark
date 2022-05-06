@@ -45,22 +45,6 @@ class UniqueExperimentalSetup:
     def dto(self):
         return self._dto
 
-    def __str__(self):
-        kendall_pieces = []
-        for (method_a, method_b), value in self._dto.kendall_coefficients.items():
-            kendall_pieces.append(f'{method_a} vs {method_b} :\t{value: .3f}')
-        kendall_piece = "\n\t\t".join(kendall_pieces)
-        spearman_pieces = []
-        for (method_a, method_b), value in self._dto.spearman_coefficients.items():
-            spearman_pieces.append(f'{method_a} vs {method_b} :\t{value: .3f}')
-        spearman_piece = "\n\t\t".join(spearman_pieces)
-        return f'Setup:' \
-               f'\n\tExperts: {self._dto.setup_info.num_experts} ' \
-               f'\n\tAlternatives: {self._dto.setup_info.num_alternatives}, ' \
-               f'\n\tCriteria: {self._dto.setup_info.num_criteria}' \
-               f'\n\tAverage Kendell: \n\t\t{kendall_piece}' \
-               f'\n\tAverage Spearman: \n\t\t{spearman_piece}'
-
 
 def _load_experiments_info(experiments_configuration_path):
     with experiments_configuration_path.open(encoding='utf-8') as file:
