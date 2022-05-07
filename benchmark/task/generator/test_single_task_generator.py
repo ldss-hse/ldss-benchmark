@@ -11,10 +11,37 @@ from benchmark.task.schemas.task_scheme import TaskDTOScheme
 from benchmark.task.task_model import TaskModelFactory
 
 
-@pytest.mark.skip(reason='ML-LDM does not currently support explicit expert weights')
 def test_end_to_end_single_generator_numeric_task():
     num_alternatives = 4
     generator = SingleTaskGenerator(num_experts=1,
+                                    num_alternatives=num_alternatives,
+                                    num_criteria_groups=1,
+                                    num_criteria_per_group=6,
+                                    task_type=TaskType.NUMERIC_ONLY)
+    res_dto: TaskDTOScheme = generator.run()
+
+    path = ARTIFACTS_PATH / 'tests_artifacts' / 'gen_task_1.json'
+    path.parent.mkdir(exist_ok=True, parents=True)
+    save_to_json(path, res_dto)
+
+    task = TaskModelFactory().from_json(path)
+
+    decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(task)
+    res = decision_maker.run()
+    assert len(res) == num_alternatives, 'All alternatives should be present in ranking'
+
+    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(task)
+    res = decision_maker.run()
+    assert len(res) == num_alternatives, 'All alternatives should be present in ranking'
+
+    decision_maker: MLLDMDecisionMaker = MLLDMDecisionMaker(task)
+    res = decision_maker.run()
+    assert len(res) == num_alternatives, 'All alternatives should be present in ranking'
+
+
+def test_end_to_end_single_generator_numeric_task_multiple_experts():
+    num_alternatives = 4
+    generator = SingleTaskGenerator(num_experts=10,
                                     num_alternatives=num_alternatives,
                                     num_criteria_groups=1,
                                     num_criteria_per_group=6,
