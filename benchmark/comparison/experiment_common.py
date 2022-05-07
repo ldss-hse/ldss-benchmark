@@ -23,10 +23,10 @@ def run_experiment(experiment_config: ExperimentInfoDTO, experiment_root_path):
 
     if experiment_config.generate_new_dataset:
         shutil.rmtree(experiment_tasks_path, ignore_errors=True)
-        generate_tasks(experiment_tasks_path, experiments_settings_path, experiment_config)
+        generate_tasks(experiment_tasks_path, experiments_settings_path, experiment_config, is_multiprocessing=True)
 
     if experiment_config.execute_decision_makers:
-        run_decision_makers(experiment_tasks_path, experiment_reports_path)
+        run_decision_makers(experiment_tasks_path, experiment_reports_path, is_multiprocessing=True)
 
     if experiment_config.calculate_correlation_reports:
         correlation_report = CorrelationReport(experiment_reports_path, experiments_settings_path)

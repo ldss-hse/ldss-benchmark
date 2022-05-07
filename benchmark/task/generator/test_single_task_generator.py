@@ -17,7 +17,8 @@ def test_end_to_end_single_generator_numeric_task():
                                     num_alternatives=num_alternatives,
                                     num_criteria_groups=1,
                                     num_criteria_per_group=6,
-                                    task_type=TaskType.NUMERIC_ONLY)
+                                    task_type=TaskType.NUMERIC_ONLY,
+                                    equal_expert_weights=True)
     res_dto: TaskDTOScheme = generator.run()
 
     path = ARTIFACTS_PATH / 'tests_artifacts' / 'gen_task_1.json'
@@ -45,7 +46,8 @@ def test_end_to_end_single_generator_numeric_task_multiple_experts():
                                     num_alternatives=num_alternatives,
                                     num_criteria_groups=1,
                                     num_criteria_per_group=6,
-                                    task_type=TaskType.NUMERIC_ONLY)
+                                    task_type=TaskType.NUMERIC_ONLY,
+                                    equal_expert_weights=False)
     res_dto: TaskDTOScheme = generator.run()
 
     path = ARTIFACTS_PATH / 'tests_artifacts' / 'gen_task_1.json'

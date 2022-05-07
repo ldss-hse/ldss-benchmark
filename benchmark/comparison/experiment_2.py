@@ -13,7 +13,8 @@ def main():
                                           criteria_range=(5, ),
                                           num_experts=10,
                                           num_replicas=10,
-                                          num_criteria_groups=1)
+                                          num_criteria_groups=1,
+                                          equal_expert_weights=True)
     run_experiment(experiment_config, experiment_root_path)
 
 
