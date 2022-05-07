@@ -14,10 +14,10 @@ def test_aircraft_selection_ml_ldm():
     res = decision_maker.run()
 
     expected_res_raw = [
-        [0, "[{'m': 0.17255354}]"],
-        [2, "[{'m': 0.11221862}]"],
-        [1, "[{'m': -0.25417423}]"],
-        [3, "[{'m': -0.29175043}]"]
+        [2, "[{'m': 0.21458054}]"],
+        [0, "[{'m': 0.16432953}]"],
+        [3, "[{'m': -0.24468136}]"],
+        [1, "[{'m': -0.37298417}]"]
     ]
     expected_res = np.array(expected_res_raw, dtype=object)
     assert np.array_equal(res, expected_res), 'Reported aggregation results do not match'

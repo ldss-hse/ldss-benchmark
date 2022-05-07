@@ -30,8 +30,12 @@ class ElectreDecisionMaker(IDecisionMaker):
         self._preference_order_indexes = None
 
     def run(self):
+        # 0. Step that is not a part of official methodology but at the same time
+        # required in cases there are several experts whose opinion should be considered by the Decision Maker
+        self._aggregate_assessments_by_experts()
+
         # 1. Normalize Decision Matrix
-        self._normalize_matrices()
+        self._normalize_matrix()
 
         # 2. Calculate weighted Decision Matrix
         assert self._criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
@@ -64,7 +68,7 @@ class ElectreDecisionMaker(IDecisionMaker):
         self._concordance = {}
         self._discordance = {}
 
-        weighted_dm = self.get_first_decision_matrix().get_weighted()
+        weighted_dm = self._joint_decision_matrix.get_weighted()
 
         alternatives_ids = list(range(len(weighted_dm)))
         comparison_pairs = itertools.product(alternatives_ids, alternatives_ids)
@@ -106,7 +110,7 @@ class ElectreDecisionMaker(IDecisionMaker):
     def _calculate_discordance_matrix(self):
         self._discordance_matrix = np.zeros((self._task.num_alternatives, self._task.num_alternatives))
 
-        decision_matrix = self.get_first_decision_matrix().get_weighted()
+        decision_matrix = self._joint_decision_matrix.get_weighted()
         for k_index, _ in enumerate(self._concordance_matrix):
             for l_index, _ in enumerate(self._concordance_matrix[k_index]):
                 if k_index == l_index:

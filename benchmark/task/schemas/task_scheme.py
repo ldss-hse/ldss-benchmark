@@ -98,9 +98,9 @@ class TaskDTOScheme:
     abstractionLevels: List[AbstractionLevelDescription]
     abstractionLevelWeights: Dict[str, float]
     expertWeightsRule: Dict[str, float]
-    expertWeights: Dict[str, float]
     experts: List[ExpertDescription]
     estimations: Dict[str, List[AlternativeAssessmentDescription]]
+    expertWeights: Dict[str, float] = None
 
     class Config:
         arbitrary_types_allowed = True

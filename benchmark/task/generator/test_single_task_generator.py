@@ -1,3 +1,5 @@
+import pytest
+
 from benchmark.constants import ARTIFACTS_PATH
 from benchmark.methods.electre_i.core import ElectreDecisionMaker
 from benchmark.methods.ml_ldm.core import MLLDMDecisionMaker
@@ -9,6 +11,7 @@ from benchmark.task.schemas.task_scheme import TaskDTOScheme
 from benchmark.task.task_model import TaskModelFactory
 
 
+@pytest.mark.skip(reason='ML-LDM does not currently support explicit expert weights')
 def test_end_to_end_single_generator_numeric_task():
     num_alternatives = 4
     generator = SingleTaskGenerator(num_experts=1,
