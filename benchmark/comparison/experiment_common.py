@@ -9,7 +9,9 @@ from benchmark.task.generator.dumper import save_to_json
 
 
 def run_experiment(experiment_config: ExperimentInfoDTO, experiment_root_path):
-    print(f'Running new experiment: assessments: {experiment_config.task_type}, {experiment_config.num_experts} expert')
+    print(f'Running new experiment: assessments: {experiment_config.task_type}, {experiment_config.num_experts} expert,'
+          f'expert weights are equal: {experiment_config.equal_expert_weights},'
+          f'expert weights are assigned automatically: {experiment_config.generate_concrete_expert_weights}')
 
     experiment_reports_path = experiment_root_path / 'reports'
     experiment_tasks_path = experiment_root_path / 'tasks'

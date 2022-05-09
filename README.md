@@ -20,6 +20,27 @@
 | Parameter              | Value           |
 |:-----------------------|:----------------|
 | Number of experts      | 1               |
+| Weights of experts     | Equal           |
 | Number of alternatives | (3, 5, 7, 9)    |
 | Number of criteria     | (5, 10, 15, 20) |
 | Types of assessments   | Numeric         |
+
+### Experiment  no. 2
+
+| Parameter              | Value                     |
+|:-----------------------|:--------------------------|
+| Number of experts      | 10                        |
+| Weights of experts     | Equal                     |
+| Number of alternatives | (3, 5, 7, 9)              |
+| Number of criteria     | (5, 10, 15, 20)           |
+| Types of assessments   | Numeric, Crisp Linguistic |
+
+### Experiment  no. 3
+
+| Parameter              | Value                     |
+|:-----------------------|:--------------------------|
+| Number of experts      | 10                        |
+| Weights of experts     | Automatically assigned    |
+| Number of alternatives | (3, 5, 7, 9)              |
+| Number of criteria     | (5, 10, 15, 20)           |
+| Types of assessments   | Numeric, Crisp Linguistic |

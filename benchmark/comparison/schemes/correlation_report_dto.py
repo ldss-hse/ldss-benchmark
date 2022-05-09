@@ -18,6 +18,7 @@ class ExperimentInfoDTO:
     execute_decision_makers: Optional[bool] = True
     calculate_correlation_reports: Optional[bool] = True
     equal_expert_weights: Optional[bool] = True
+    generate_concrete_expert_weights: Optional[bool] = True
 
 
 @dataclass

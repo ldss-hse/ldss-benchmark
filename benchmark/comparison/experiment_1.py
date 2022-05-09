@@ -17,9 +17,11 @@ def main():
     experiment_config = ExperimentInfoDTO(task_type=TaskType.NUMERIC_ONLY,
                                           alternatives_range=(3, 5, 7, 9),
                                           criteria_range=(5, 10, 15, 20),
-                                          num_experts=10,
+                                          num_experts=1,
                                           num_replicas=100,
-                                          num_criteria_groups=1)
+                                          num_criteria_groups=1,
+                                          equal_expert_weights=True,
+                                          generate_concrete_expert_weights=True)
     run_experiment(experiment_config, experiment_root_path)
 
 

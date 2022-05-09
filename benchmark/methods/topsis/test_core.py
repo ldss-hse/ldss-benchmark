@@ -115,3 +115,21 @@ def test_ideal_alternatives_multi_expert_case():
     ]
     expected_res = np.array(expected_res_raw)
     assert np.array_equal(res, expected_res), 'Reported aggregation results do not match'
+
+
+def test_ideal_alternatives_multi_expert_case_no_expert_weights():
+    path_to_task = TASKS_ROOT / '3_aircraft_multiple_experts_no_weights' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+
+    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(task)
+
+    res = decision_maker.run()
+
+    expected_res_raw = [
+        [0., .729],
+        [2., .572],
+        [3., .353],
+        [1., .267],
+    ]
+    expected_res = np.array(expected_res_raw)
+    assert np.array_equal(res, expected_res), 'Reported aggregation results do not match'

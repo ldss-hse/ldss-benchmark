@@ -41,6 +41,14 @@ class IDecisionMaker:
         if self._joint_decision_matrix is not None:
             return
         acc = np.zeros_like(self._decision_matrices[self._task._dto.experts[0].expertID].get_raw())
+
+        weights = self._task._dto.expertWeights
+        if weights is None:
+            weights = self._decide_expert_weights()
+
         for expert_name, expert_assessments in self._decision_matrices.items():
-            acc += expert_assessments.get_raw() * self._task._dto.expertWeights[expert_name]
+            acc += expert_assessments.get_raw() * weights[expert_name]
         self._joint_decision_matrix = DecisionMatrix(raw_assessments=np.round(acc, 4))
+
+    def _decide_expert_weights(self):
+        return NotImplemented

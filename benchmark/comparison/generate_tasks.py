@@ -4,7 +4,6 @@ from pathlib import Path
 from benchmark.comparison.schemes.correlation_report_dto import ExperimentInfoDTO
 from benchmark.task.generator.dumper import save_to_json
 from benchmark.task.generator.single_task_generator import SingleTaskGenerator
-from benchmark.task.generator.task_type import TaskType
 from benchmark.task.schemas.task_scheme import TaskDTOScheme
 
 
@@ -15,7 +14,8 @@ def _single_task_generation(task_id, experiment_config, num_alternatives, num_cr
                                     num_criteria_groups=experiment_config.num_criteria_groups,
                                     num_criteria_per_group=num_criteria,
                                     task_type=experiment_config.task_type,
-                                    equal_expert_weights=experiment_config.equal_expert_weights)
+                                    equal_expert_weights=experiment_config.equal_expert_weights,
+                                    generate_concrete_expert_weights=experiment_config.generate_concrete_expert_weights)
     res_dto: TaskDTOScheme = generator.run()
 
     path = experiment_tasks_path / f'task_{task_id}.json'

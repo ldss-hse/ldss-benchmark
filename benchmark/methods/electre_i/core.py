@@ -136,7 +136,7 @@ class ElectreDecisionMaker(IDecisionMaker):
 
     def _calculate_discordance_dominance_matrix(self):
         _average_discordance_index = np.sum(self._discordance_matrix) / (
-                    self._task.num_alternatives * (self._task.num_alternatives - 1))
+                self._task.num_alternatives * (self._task.num_alternatives - 1))
         self._discordance_dominance_matrix = self._discordance_matrix <= _average_discordance_index
         np.fill_diagonal(self._discordance_dominance_matrix, False)
 
@@ -152,3 +152,9 @@ class ElectreDecisionMaker(IDecisionMaker):
         # nx.draw(dependency_graph, with_labels=True)
 
         self._preference_order_indexes = np.array([[i, 0] for i in nx.topological_sort(dependency_graph)])
+
+    def _decide_expert_weights(self):
+        # To this moment there is no heuristic for intellectual weights assignment, therefore
+        # all experts are assigned equal weights
+        equal_weight = 1 / len(self._task._dto.experts)
+        return {expert.expertID: equal_weight for expert in self._task._dto.experts}

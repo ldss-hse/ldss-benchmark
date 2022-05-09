@@ -86,3 +86,9 @@ class TopsisDecisionMaker(IDecisionMaker):
 
     def _rank_preference_order(self):
         self._preference_order_indexes = np.argsort(self._relative_closeness)
+
+    def _decide_expert_weights(self):
+        # To this moment there is no heuristic for intellectual weights assignment, therefore
+        # all experts are assigned equal weights
+        equal_weight = 1 / len(self._task._dto.experts)
+        return {expert.expertID: equal_weight for expert in self._task._dto.experts}
