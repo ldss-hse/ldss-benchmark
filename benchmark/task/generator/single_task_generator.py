@@ -3,7 +3,7 @@ from benchmark.task.generator.primitives.abstraction_levels_weight import genera
 from benchmark.task.generator.primitives.alternatives import generate_alternatives
 from benchmark.task.generator.primitives.assessments import generate_assessments
 from benchmark.task.generator.primitives.criteria import generate_criteria
-from benchmark.task.generator.primitives.criteria_weights import generate_criteria_weights, generate_weights
+from benchmark.task.generator.primitives.criteria_weights import generate_criteria_weights
 from benchmark.task.generator.primitives.expert_weights import generate_expert_weights_rule, generate_expert_weights
 from benchmark.task.generator.primitives.experts import generate_experts
 from benchmark.task.generator.primitives.scale import generate_scales

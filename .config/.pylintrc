@@ -150,7 +150,8 @@ disable=print-statement,
         missing-module-docstring,
         too-many-instance-attributes,
         protected-access,
-        arguments-out-of-order
+        arguments-out-of-order,
+        consider-using-with
 
 
 # Enable the message, report, category or checker with the given id(s). You can

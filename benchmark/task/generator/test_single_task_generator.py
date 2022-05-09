@@ -1,5 +1,3 @@
-import pytest
-
 from benchmark.constants import ARTIFACTS_PATH
 from benchmark.methods.electre_i.core import ElectreDecisionMaker
 from benchmark.methods.ml_ldm.core import MLLDMDecisionMaker
