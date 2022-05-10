@@ -190,3 +190,23 @@ def visualize_correlation_report(full_report_path: Path, res_dir_path: Path, lan
                                   correlation_report_df=correlation_report_df,
                                   res_dir_path=res_dir_path,
                                   language=language)
+
+
+def collect_top_1_matches_from_dto(full_report_path: Path, res_dir_path: Path):
+    correlation_report_dto: CorrelationReportDTO = load_report_dto(full_report_path)
+
+    top_1_hits = {}
+    total_quantity = 0
+    for unique_configuration in correlation_report_dto.unique_configurations:
+        for methods_pair, quantity in unique_configuration.top_1_matches.items():
+            top_1_hits[methods_pair] = top_1_hits.get(methods_pair, 0) + quantity
+        total_quantity += unique_configuration.total_runs
+
+    rows = []
+    for methods_pair, hits in top_1_hits.items():
+        rows.append({
+            'method': methods_pair,
+            'hits': hits / total_quantity
+        })
+    df = pd.DataFrame(rows)
+    df.to_csv(res_dir_path / 'top_1_hits.tsv', sep='\t')

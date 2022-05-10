@@ -25,7 +25,7 @@ def main():
     # Additional settings for disabling first three phases
     experiment_config.generate_new_dataset = False
     experiment_config.execute_decision_makers = False
-    experiment_config.calculate_correlation_reports = False
+    experiment_config.calculate_correlation_reports = True
 
     run_experiment(experiment_config, experiment_root_path)
 

@@ -9,13 +9,6 @@ import pandas as pd
 
 from benchmark.comparison.enums import StatisticsNames
 
-
-def get_img_folder_path():
-    project_root = os.path.dirname(os.path.realpath(__file__))
-    tmp_artifacts_root = os.path.join(project_root, 'img')
-    return tmp_artifacts_root
-
-
 class Language(str, enum.Enum):
     ENGLIGH = 'ENGLISH'
     RUSSIAN = 'RUSSIAN'
