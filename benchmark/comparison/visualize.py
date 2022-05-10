@@ -1,14 +1,28 @@
+import enum
 from itertools import combinations
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from benchmark.comparison.draw_plots import create_chart, ChartConfig, Language, save_chart
 from benchmark.comparison.enums import StatisticsNames
 from benchmark.comparison.methods_names import MethodsNames
 from benchmark.comparison.schemes.correlation_report_dto import CorrelationReportDTO
-from benchmark.comparison.schemes.unique_experimental_setup import UniqueExperimentalSetupDTO
 from benchmark.comparison.utils import two_methods_to_key
+
+
+class DFReportColumnsNames(str, enum.Enum):
+    NUM_CRITERIA = 'num_criteria'
+    NUM_ALTERNATIVES = 'num_alternatives'
+    NUM_EXPERTS = 'num_experts'
+    NUM_CRITERIA_GROUPS = 'num_criteria_groups'
+    METHODS_NAME = 'method'
+    COEFFICIENT_TYPE = 'coefficient_type'
+    COEFFICIENT_VALUE = 'coefficient_value'
+
+    def __str__(self):
+        return self.value
 
 
 def load_report_dto(report_path: Path) -> CorrelationReportDTO:
@@ -18,168 +32,161 @@ def load_report_dto(report_path: Path) -> CorrelationReportDTO:
     return CorrelationReportDTO.__pydantic_model__.parse_raw(task_raw)
 
 
-def _get_correlation_coefficient(dto: UniqueExperimentalSetupDTO, method_a, method_b, coef_type: StatisticsNames):
-    object_to_query = None
-    if coef_type is StatisticsNames.KENDALL_TAU:
-        object_to_query = dto.kendall_coefficients
-    elif coef_type is StatisticsNames.SPEARMAN_RHO:
-        object_to_query = dto.spearman_coefficients
+def create_df_report_from_dto(dto: CorrelationReportDTO) -> pd.DataFrame:
+    all_rows = []
+    for unique_configuration in dto.unique_configurations:
+        sample_row = {
+            str(DFReportColumnsNames.NUM_CRITERIA): unique_configuration.setup_info.num_criteria,
+            str(DFReportColumnsNames.NUM_ALTERNATIVES): unique_configuration.setup_info.num_alternatives,
+            str(DFReportColumnsNames.NUM_EXPERTS): unique_configuration.setup_info.num_experts,
+            str(DFReportColumnsNames.NUM_CRITERIA_GROUPS): unique_configuration.setup_info.num_criteria_groups,
 
-    if object_to_query is None:
-        return NotImplemented
+        }
+        for stats_type, actual_coefficients in zip((StatisticsNames.KENDALL_TAU, StatisticsNames.SPEARMAN_RHO),
+                                                   (unique_configuration.kendall_coefficients,
+                                                    unique_configuration.spearman_coefficients)):
+            for methods_pair, value in actual_coefficients.items():
+                all_rows.append({
+                    **sample_row,
+                    str(DFReportColumnsNames.METHODS_NAME): methods_pair,
+                    str(DFReportColumnsNames.COEFFICIENT_TYPE): stats_type,
+                    str(DFReportColumnsNames.COEFFICIENT_VALUE): float(value)
+                })
 
-    coef_value = object_to_query.get(two_methods_to_key(method_a, method_b))
-    if coef_value is None:
-        coef_value = object_to_query.get(two_methods_to_key(method_b, method_a))
-    return round(coef_value, 2)
+    experiment_df = pd.DataFrame(all_rows)
+    assert len(experiment_df['method'].unique()) == 3, 'Only three methods are considered to this moment'
 
-
-def compare_two_methods_by_alternatives(dto: CorrelationReportDTO, method_a: MethodsNames, method_b: MethodsNames):
-    alternative_to_average = {}
-    key_pair = two_methods_to_key(method_a, method_b)
-    for alternatives_number in dto.experiment_info.alternatives_range:
-        all_configurations_with_this_number = list(filter(
-            lambda x, a=alternatives_number: x.setup_info.num_alternatives == a,
-            dto.unique_configurations
-        ))
-
-        for criteria_number in dto.experiment_info.criteria_range:
-            all_configurations_with_this_number_and_criteria = list(filter(
-                lambda x, c=criteria_number: x.setup_info.num_criteria == c,
-                all_configurations_with_this_number
-            ))
-
-            num_experiments_with_different_criteria = len(all_configurations_with_this_number_and_criteria)
-            assert num_experiments_with_different_criteria == 1, \
-                'Exactly one unique configuration for each criterion+alternative. Serious fault'
-            element = all_configurations_with_this_number_and_criteria[0]
-
-            if alternative_to_average.get(criteria_number) is None:
-                alternative_to_average[criteria_number] = {}
-            if alternative_to_average[criteria_number].get(alternatives_number) is None:
-                alternative_to_average[criteria_number][alternatives_number] = {}
-            alternative_to_average[criteria_number][alternatives_number][key_pair] = {
-                str(StatisticsNames.KENDALL_TAU): _get_correlation_coefficient(element, method_a, method_b,
-                                                                               StatisticsNames.KENDALL_TAU),
-                str(StatisticsNames.SPEARMAN_RHO): _get_correlation_coefficient(element, method_a, method_b,
-                                                                                StatisticsNames.SPEARMAN_RHO),
-            }
-
-    return alternative_to_average
+    return experiment_df
 
 
-def compare_two_methods_by_criteria(dto, criteria_value: int = None):
-    criteria_to_average = {}
-    all_pairs = list(combinations((MethodsNames.TOPSIS, MethodsNames.ELECTRE_I, MethodsNames.ML_LDM), 2))
-    for method_a, method_b in all_pairs:
-        key_pair = two_methods_to_key(method_a, method_b)
+def save_plot_by_criteria(criteria_level, stats_type: StatisticsNames, correlation_report_df: pd.DataFrame,
+                          res_dir_path, language: Language):
+    filtered_df = correlation_report_df[
+        (correlation_report_df[str(DFReportColumnsNames.NUM_CRITERIA)] == criteria_level) &
+        (correlation_report_df[str(DFReportColumnsNames.COEFFICIENT_TYPE)] == str(stats_type))
+        ]
 
-        all_configurations_with_this_number = list(filter(
-            lambda x: x.setup_info.num_criteria == criteria_value,
-            dto.unique_configurations
-        ))
+    labels = list(correlation_report_df[str(DFReportColumnsNames.METHODS_NAME)].unique())
 
-        for alternatives_number in dto.experiment_info.alternatives_range:
+    unique_alternatives = list(correlation_report_df[str(DFReportColumnsNames.NUM_ALTERNATIVES)].unique())
+    rows = {
+        alternative_number: np.zeros((len(labels))) for alternative_number in unique_alternatives
+    }
+    for alternative_number in unique_alternatives:
+        for method_index, method_pair in enumerate(labels):
+            value = filtered_df[
+                (filtered_df[str(DFReportColumnsNames.METHODS_NAME)] == method_pair) &
+                (filtered_df[str(DFReportColumnsNames.NUM_ALTERNATIVES)] == alternative_number)
+                ]
+            assert len(value[str(DFReportColumnsNames.COEFFICIENT_VALUE)]) == 1, 'Only one experiment can occur with' \
+                                                                                 'such settings. Serious error'
+            rows[alternative_number][method_index] = value[str(DFReportColumnsNames.COEFFICIENT_VALUE)].values[0]
 
-            all_configurations_with_this_number_and_alternatives = list(filter(
-                lambda x, a=alternatives_number: x.setup_info.num_alternatives == a,
-                all_configurations_with_this_number
-            ))
-
-            num_experiments_with_different_alternatives = len(all_configurations_with_this_number_and_alternatives)
-            assert num_experiments_with_different_alternatives == 1, \
-                'Exactly one unique configuration for each criterion+alternative. Serious fault'
-            element = all_configurations_with_this_number_and_alternatives[0]
-
-            if criteria_to_average.get(criteria_value) is None:
-                criteria_to_average[criteria_value] = {}
-            if criteria_to_average[criteria_value].get(alternatives_number) is None:
-                criteria_to_average[criteria_value][alternatives_number] = {}
-            criteria_to_average[criteria_value][alternatives_number][key_pair] = {
-                str(StatisticsNames.KENDALL_TAU): _get_correlation_coefficient(element, method_a, method_b,
-                                                                               StatisticsNames.KENDALL_TAU),
-                str(StatisticsNames.SPEARMAN_RHO): _get_correlation_coefficient(element, method_a, method_b,
-                                                                                StatisticsNames.SPEARMAN_RHO),
-            }
-
-    return criteria_to_average
-
-
-def extract_for_chart(res_by_criteria, stats_type, criteria_value):
-    labels = sorted(res_by_criteria[criteria_value][list(res_by_criteria[criteria_value].keys())[0]].keys())
-
-    rows = {}
-    for row_name, row_values in res_by_criteria[criteria_value].items():
-        rows[str(row_name)] = np.array([row_values[label][stats_type] for label in labels])
-
-    return labels, rows
-
-
-def extract_for_pairwise_chart(res_by_alternatives, stats_type, method_a, method_b):
-    labels = sorted(
-        res_by_alternatives[list(res_by_alternatives.keys())[0]].keys()
-    )
-
-    rows = {}
-    key_pair = two_methods_to_key(method_a, method_b)
-    for row_name, row_values in res_by_alternatives.items():
-        acc = []
-        for label in labels:
-            if row_values[label].get(key_pair) is None:
-                key_pair = two_methods_to_key(method_b, method_a)
-            acc.append(row_values[label][key_pair][stats_type])
-        rows[str(row_name)] = np.array(acc)
-
-    return labels, rows
-
-
-def save_plot_by_criteria(criteria_level, stats_type: StatisticsNames, correlation_report_dto, res_dir_path):
-    # key is criteria number, value is mean correlation coefficients for all pairs
-    res_by_criteria = compare_two_methods_by_criteria(correlation_report_dto, criteria_value=criteria_level)
-    labels, rows = extract_for_chart(res_by_criteria, stats_type=StatisticsNames.KENDALL_TAU,
-                                     criteria_value=criteria_level)
-    config = ChartConfig(language=Language.ENGLIGH,
+    config = ChartConfig(language=language,
                          coefficient_type=stats_type,
                          font_settings=None,
-                         x_title_type='criteria',
-                         title=f'Mean of tau for {criteria_level} criteria')
+                         x_title_type='criteria')
     compiled_plot = create_chart(labels=labels, rows=rows, config=config)
 
     file_name = f'by_criteria_{criteria_level}_all_methods_{stats_type}'
     save_chart(compiled_plot, res_dir_path, file_name, config)
 
 
-def save_plot_by_alternatives(method_a, method_b, stats_type: StatisticsNames, correlation_report_dto, res_dir_path):
-    # key is alternatives number, value is mean correlation coefficients for selected two methods
-    res_by_alternatives = compare_two_methods_by_alternatives(correlation_report_dto, method_a, method_b)
-    labels, rows = extract_for_pairwise_chart(res_by_alternatives, stats_type=stats_type,
-                                              method_a=method_a, method_b=method_b)
-    config = ChartConfig(language=Language.ENGLIGH,
-                         coefficient_type=StatisticsNames.KENDALL_TAU,
+def save_plot_by_alternatives(method_a, method_b, stats_type: StatisticsNames, correlation_report_df: pd.DataFrame,
+                              res_dir_path, language: Language):
+    methods_pairs = list(correlation_report_df[str(DFReportColumnsNames.METHODS_NAME)].unique())
+
+    key_pair = two_methods_to_key(method_a, method_b)
+    if key_pair not in methods_pairs:
+        key_pair = two_methods_to_key(method_b, method_a)
+
+    filtered_df = correlation_report_df[
+        (correlation_report_df[str(DFReportColumnsNames.METHODS_NAME)] == key_pair) &
+        (correlation_report_df[str(DFReportColumnsNames.COEFFICIENT_TYPE)] == str(stats_type))
+        ]
+
+    labels = list(correlation_report_df[str(DFReportColumnsNames.NUM_ALTERNATIVES)].unique())
+    unique_criteria = list(correlation_report_df[str(DFReportColumnsNames.NUM_CRITERIA)].unique())
+    rows = {
+        criteria_number: np.zeros((len(labels))) for criteria_number in unique_criteria
+    }
+
+    for criteria_number in unique_criteria:
+        for alternative_index, alternative_number in enumerate(labels):
+            value = filtered_df[
+                (filtered_df[str(DFReportColumnsNames.NUM_CRITERIA)] == criteria_number) &
+                (filtered_df[str(DFReportColumnsNames.NUM_ALTERNATIVES)] == alternative_number)
+                ]
+            assert len(value[str(DFReportColumnsNames.COEFFICIENT_VALUE)]) == 1, 'Only one experiment can occur with' \
+                                                                                 'such settings. Serious error'
+            rows[criteria_number][alternative_index] = value[str(DFReportColumnsNames.COEFFICIENT_VALUE)].values[0]
+
+    config = ChartConfig(language=language,
+                         coefficient_type=stats_type,
                          font_settings=None,
-                         x_title_type='alternatives',
-                         title=f'Mean of tau for {method_a} vs {method_b}')
+                         x_title_type='alternatives')
     compiled_plot = create_chart(labels=labels, rows=rows, config=config)
 
     file_name = f'by_alternatives_{method_a}_vs_{method_b}_{stats_type}'
     save_chart(compiled_plot, res_dir_path, file_name, config)
 
 
-def visualize_correlation_report(full_report_path: Path, res_dir_path: Path):
+def save_averages_pairwise_chart(correlation_report_df: pd.DataFrame, stats_type, res_dir_path, language: Language):
+    filtered_df = correlation_report_df[
+        correlation_report_df[str(DFReportColumnsNames.COEFFICIENT_TYPE)] == str(stats_type)]
+    grouped_df = filtered_df \
+        .groupby(
+        [
+            str(DFReportColumnsNames.METHODS_NAME),
+            str(DFReportColumnsNames.NUM_ALTERNATIVES)
+        ]) \
+        .agg({str(DFReportColumnsNames.COEFFICIENT_VALUE): ['mean']})
+
+    labels = list(correlation_report_df[str(DFReportColumnsNames.METHODS_NAME)].unique())
+
+    unique_alternatives = list(correlation_report_df[str(DFReportColumnsNames.NUM_ALTERNATIVES)].unique())
+    rows = {
+        alternative_number: np.zeros((len(labels))) for alternative_number in unique_alternatives
+    }
+    for name in grouped_df.index:
+        methods_pair, alternative_number = name
+        rows[alternative_number][labels.index(methods_pair)] = grouped_df.loc[name][0]
+
+    config = ChartConfig(language=language,
+                         coefficient_type=stats_type,
+                         font_settings=None,
+                         x_title_type='alternatives')
+    compiled_plot = create_chart(labels=labels, rows=rows, config=config)
+
+    file_name = f'aggregated_all_methods_{stats_type}'
+    save_chart(compiled_plot, res_dir_path, file_name, config)
+
+
+def visualize_correlation_report(full_report_path: Path, res_dir_path: Path, language: Language = Language.RUSSIAN):
     correlation_report_dto: CorrelationReportDTO = load_report_dto(full_report_path)
+
+    correlation_report_df: pd.DataFrame = create_df_report_from_dto(correlation_report_dto)
+
+    for stats_type in (StatisticsNames.KENDALL_TAU, StatisticsNames.SPEARMAN_RHO):
+        save_averages_pairwise_chart(correlation_report_df, stats_type=stats_type, res_dir_path=res_dir_path,
+                                     language=language)
+
+    all_pairs = list(combinations((MethodsNames.TOPSIS, MethodsNames.ELECTRE_I, MethodsNames.ML_LDM), 2))
 
     for stats_type in (StatisticsNames.KENDALL_TAU, StatisticsNames.SPEARMAN_RHO):
         # 1. Per alternative mode
-        for method_a, method_b in combinations((MethodsNames.TOPSIS, MethodsNames.ELECTRE_I, MethodsNames.ML_LDM), 2):
+        for method_a, method_b in all_pairs:
             save_plot_by_alternatives(method_a=method_a,
                                       method_b=method_b,
                                       stats_type=stats_type,
-                                      correlation_report_dto=correlation_report_dto,
-                                      res_dir_path=res_dir_path)
+                                      correlation_report_df=correlation_report_df,
+                                      res_dir_path=res_dir_path,
+                                      language=language)
 
         # 2. Per criteria mode
         for criteria_level in correlation_report_dto.experiment_info.criteria_range:
             save_plot_by_criteria(criteria_level=criteria_level,
                                   stats_type=stats_type,
-                                  correlation_report_dto=correlation_report_dto,
-                                  res_dir_path=res_dir_path)
+                                  correlation_report_df=correlation_report_df,
+                                  res_dir_path=res_dir_path,
+                                  language=language)

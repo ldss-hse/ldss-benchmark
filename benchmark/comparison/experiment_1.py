@@ -22,6 +22,11 @@ def main():
                                           num_criteria_groups=1,
                                           equal_expert_weights=True,
                                           generate_concrete_expert_weights=True)
+    # Additional settings for disabling first three phases
+    experiment_config.generate_new_dataset = False
+    experiment_config.execute_decision_makers = False
+    experiment_config.calculate_correlation_reports = False
+
     run_experiment(experiment_config, experiment_root_path)
 
 
