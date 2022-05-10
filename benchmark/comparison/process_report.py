@@ -195,6 +195,8 @@ def visualize_correlation_report(full_report_path: Path, res_dir_path: Path, lan
 def collect_top_1_matches_from_dto(full_report_path: Path, res_dir_path: Path):
     correlation_report_dto: CorrelationReportDTO = load_report_dto(full_report_path)
 
+    correlation_report_df: pd.DataFrame = create_df_report_from_dto(correlation_report_dto)
+
     top_1_hits = {}
     total_quantity = 0
     for unique_configuration in correlation_report_dto.unique_configurations:
@@ -202,11 +204,32 @@ def collect_top_1_matches_from_dto(full_report_path: Path, res_dir_path: Path):
             top_1_hits[methods_pair] = top_1_hits.get(methods_pair, 0) + quantity
         total_quantity += unique_configuration.total_runs
 
+    grouped_df = correlation_report_df \
+        .groupby(
+        [
+            str(DFReportColumnsNames.METHODS_NAME),
+            str(DFReportColumnsNames.COEFFICIENT_TYPE)
+        ]) \
+        .agg({str(DFReportColumnsNames.COEFFICIENT_VALUE): ['mean']})
+
     rows = []
     for methods_pair, hits in top_1_hits.items():
         rows.append({
             'method': methods_pair,
-            'hits': hits / total_quantity
+            'hits ratio': hits / total_quantity,
+            'average tau': None,
+            'average rho': None
         })
+
+    for name in grouped_df.index:
+        methods_pair, coefficient_name = name
+
+        row = list(filter(lambda x, y=methods_pair: x['method'] == y, rows))[0]
+        if coefficient_name is StatisticsNames.KENDALL_TAU:
+            row['average tau'] = grouped_df.loc[name][0]
+        elif coefficient_name is StatisticsNames.SPEARMAN_RHO:
+            row['average rho'] = grouped_df.loc[name][0]
+
     df = pd.DataFrame(rows)
+    df = df.round(2)
     df.to_csv(res_dir_path / 'top_1_hits.tsv', sep='\t')
