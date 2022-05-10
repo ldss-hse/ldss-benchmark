@@ -10,7 +10,9 @@ def main():
                                     num_alternatives=4,
                                     num_criteria_groups=1,
                                     num_criteria_per_group=6,
-                                    task_type=TaskType.NUMERIC_ONLY)
+                                    task_type=TaskType.NUMERIC_ONLY,
+                                    equal_expert_weights=True,
+                                    generate_concrete_expert_weights=True)
     res_dto: TaskDTOScheme = generator.run()
 
     path = GENERATED_TASKS_PATH / 'gen_task_1.json'

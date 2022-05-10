@@ -55,7 +55,8 @@ def _load_experiments_info(experiments_configuration_path):
         alternatives_range=data['alternatives_range'],
         criteria_range=data['criteria_range'],
         num_experts=data['num_experts'],
-        num_criteria_groups=data['num_criteria_groups']
+        num_criteria_groups=data['num_criteria_groups'],
+        num_replicas=data.get('num_replicas')
     )
 
 

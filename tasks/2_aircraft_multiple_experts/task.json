@@ -123,7 +123,8 @@
     "1": 1.0
   },
   "expertWeights": {
-    "expert1": 1.0
+    "expert1": 0.6,
+    "expert2": 0.4
   },
   "experts": [
     {
@@ -131,6 +132,13 @@
       "expertID": "expert1",
       "competencies": [
         "jet fighters"
+      ]
+    },
+    {
+      "expertName": "US Economics expert no. 2",
+      "expertID": "expert2",
+      "competencies": [
+        "economics"
       ]
     }
   ],
@@ -296,6 +304,180 @@
             "criteriaID": "C5",
             "estimation": [
               "average"
+            ],
+            "scaleID": "s5"
+          },
+          {
+            "criteriaID": "C6",
+            "estimation": [
+              "average"
+            ],
+            "scaleID": "s5"
+          }
+        ]
+      }
+    ],
+    "expert2": [
+      {
+        "alternativeID": "A1",
+        "criteria2Estimation": [
+          {
+            "criteriaID": "C1",
+            "estimation": [
+              "3.0"
+            ]
+          },
+          {
+            "criteriaID": "C2",
+            "estimation": [
+              "2250"
+            ]
+          },
+          {
+            "criteriaID": "C3",
+            "estimation": [
+              "30000"
+            ]
+          },
+          {
+            "criteriaID": "C4",
+            "estimation": [
+              "8.25"
+            ]
+          },
+          {
+            "criteriaID": "C5",
+            "estimation": [
+              "very high"
+            ],
+            "scaleID": "s5"
+          },
+          {
+            "criteriaID": "C6",
+            "estimation": [
+              "high"
+            ],
+            "scaleID": "s5"
+          }
+        ]
+      },
+      {
+        "alternativeID": "A2",
+        "criteria2Estimation": [
+          {
+            "criteriaID": "C1",
+            "estimation": [
+              "3.75"
+            ]
+          },
+          {
+            "criteriaID": "C2",
+            "estimation": [
+              "4050"
+            ]
+          },
+          {
+            "criteriaID": "C3",
+            "estimation": [
+              "27000"
+            ]
+          },
+          {
+            "criteriaID": "C4",
+            "estimation": [
+              "9.75"
+            ]
+          },
+          {
+            "criteriaID": "C5",
+            "estimation": [
+              "average"
+            ],
+            "scaleID": "s5"
+          },
+          {
+            "criteriaID": "C6",
+            "estimation": [
+              "low"
+            ],
+            "scaleID": "s5"
+          }
+        ]
+      },
+      {
+        "alternativeID": "A3",
+        "criteria2Estimation": [
+          {
+            "criteriaID": "C1",
+            "estimation": [
+              "2.7"
+            ]
+          },
+          {
+            "criteriaID": "C2",
+            "estimation": [
+              "3000"
+            ]
+          },
+          {
+            "criteriaID": "C3",
+            "estimation": [
+              "31500"
+            ]
+          },
+          {
+            "criteriaID": "C4",
+            "estimation": [
+              "6.75"
+            ]
+          },
+          {
+            "criteriaID": "C5",
+            "estimation": [
+              "very high"
+            ],
+            "scaleID": "s5"
+          },
+          {
+            "criteriaID": "C6",
+            "estimation": [
+              "average"
+            ],
+            "scaleID": "s5"
+          }
+        ]
+      },
+      {
+        "alternativeID": "A4",
+        "criteria2Estimation": [
+          {
+            "criteriaID": "C1",
+            "estimation": [
+              "3.3"
+            ]
+          },
+          {
+            "criteriaID": "C2",
+            "estimation": [
+              "2700"
+            ]
+          },
+          {
+            "criteriaID": "C3",
+            "estimation": [
+              "30000"
+            ]
+          },
+          {
+            "criteriaID": "C4",
+            "estimation": [
+              "7.5"
+            ]
+          },
+          {
+            "criteriaID": "C5",
+            "estimation": [
+              "high"
             ],
             "scaleID": "s5"
           },

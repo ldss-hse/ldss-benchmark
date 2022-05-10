@@ -21,8 +21,12 @@ class TopsisDecisionMaker(IDecisionMaker):
         self._artificial_ideal_negative_alternative = None
 
     def run(self):
+        # 0. Step that is not a part of official methodology but at the same time
+        # required in cases there are several experts whose opinion should be considered by the Decision Maker
+        self._aggregate_assessments_by_experts()
+
         # 1. Normalize Decision Matrix
-        self._normalize_matrices()
+        self._normalize_matrix()
 
         # 2. Calculate weighted Decision Matrix
         assert self._criteria_weights is not None, 'Decision cannot be made with undefined criteria weights'
@@ -46,9 +50,8 @@ class TopsisDecisionMaker(IDecisionMaker):
         return np.column_stack((indexes, values))[::-1, :]
 
     def _define_artificial_ideal_alternatives(self):
-        decision_matrix = self.get_first_decision_matrix()
-        all_maximums = np.amax(decision_matrix.get_weighted(), axis=0)
-        all_minimums = np.amin(decision_matrix.get_weighted(), axis=0)
+        all_maximums = np.amax(self._joint_decision_matrix.get_weighted(), axis=0)
+        all_minimums = np.amin(self._joint_decision_matrix.get_weighted(), axis=0)
 
         ideal_alternative = []
         for index, is_benefit in enumerate(self._criteria_types):
@@ -65,8 +68,7 @@ class TopsisDecisionMaker(IDecisionMaker):
         self._artificial_ideal_negative_alternative = np.array(ideal_negative_alternative)
 
     def _define_separation_measures(self):
-        decision_matrix = self.get_first_decision_matrix()
-        weighted_dm = decision_matrix.get_weighted()
+        weighted_dm = self._joint_decision_matrix.get_weighted()
 
         def calculate_distance(matrix, vector):
             return np.around(np.sqrt(np.sum((matrix - vector) ** 2, axis=1)), decimals=4)
@@ -84,3 +86,9 @@ class TopsisDecisionMaker(IDecisionMaker):
 
     def _rank_preference_order(self):
         self._preference_order_indexes = np.argsort(self._relative_closeness)
+
+    def _decide_expert_weights(self):
+        # To this moment there is no heuristic for intellectual weights assignment, therefore
+        # all experts are assigned equal weights
+        equal_weight = 1 / len(self._task._dto.experts)
+        return {expert.expertID: equal_weight for expert in self._task._dto.experts}

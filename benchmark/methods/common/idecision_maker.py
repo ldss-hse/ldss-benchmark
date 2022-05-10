@@ -1,5 +1,7 @@
 from typing import Optional
 
+import numpy as np
+
 from benchmark.task.assessments.decision_matrix import DecisionMatrix
 from benchmark.task.task_model import TaskModel
 
@@ -9,10 +11,12 @@ class IDecisionMaker:
     _decision_matrices: dict[str, DecisionMatrix]
     _criteria_weights: Optional[list[float]]
     _criteria_types: Optional[tuple[bool]]
+    _joint_decision_matrix: Optional[DecisionMatrix]
 
     def __init__(self, task: TaskModel):
         self._task = task
         self._decision_matrices = self._task.decision_matrices
+        self._joint_decision_matrix = None
         self._criteria_weights = self._task.get_criteria_weights()
         self._criteria_types = self._task.get_criteria_types()
 
@@ -27,14 +31,24 @@ class IDecisionMaker:
     def run(self):
         return NotImplemented
 
-    def _normalize_matrices(self):
-        for _, matrix in self._decision_matrices.items():
-            matrix.normalize()
+    def _normalize_matrix(self):
+        self._joint_decision_matrix.normalize()
 
     def _apply_criteria_weights(self):
-        for _, matrix in self._decision_matrices.items():
-            matrix.apply_criteria_weights(self._criteria_weights)
+        self._joint_decision_matrix.apply_criteria_weights(self._criteria_weights)
 
-    def get_first_decision_matrix(self):
-        # WARNING: should be used only for cases when multiple decision matrices are not supported
-        return self._decision_matrices[list(self._decision_matrices.keys())[0]]
+    def _aggregate_assessments_by_experts(self):
+        if self._joint_decision_matrix is not None:
+            return
+        acc = np.zeros_like(self._decision_matrices[self._task._dto.experts[0].expertID].get_raw())
+
+        weights = self._task._dto.expertWeights
+        if weights is None:
+            weights = self._decide_expert_weights()
+
+        for expert_name, expert_assessments in self._decision_matrices.items():
+            acc += expert_assessments.get_raw() * weights[expert_name]
+        self._joint_decision_matrix = DecisionMatrix(raw_assessments=np.round(acc, 4))
+
+    def _decide_expert_weights(self):
+        return NotImplemented

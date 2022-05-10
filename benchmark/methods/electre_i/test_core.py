@@ -11,6 +11,7 @@ def test_ideal_alternatives():
     task = TaskModelFactory().from_json(path_to_task)
 
     decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(task)
+    _ = decision_maker.run()
 
     # in the original book example seems to contain errors during normalization. However,
     # in order to follow other computations we need to keep their normalized matrix
@@ -20,7 +21,7 @@ def test_ideal_alternatives():
         [.4204, .4882, .5308, .4143, .6736, .5217],
         [.5139, .4392, .5056, .4603, .4811, .3727],
     ]
-    decision_maker.get_first_decision_matrix()._normalized = np.array(their_normalized)
+    decision_maker._joint_decision_matrix._normalized = np.array(their_normalized)
 
     res = decision_maker.run()
 
@@ -106,6 +107,42 @@ def test_ideal_alternatives():
     expected_aggregate_dominance_matrix = np.array(expected_aggregate_dominance_matrix_raw)
     assert np.allclose(decision_maker._aggregate_dominance_matrix, expected_aggregate_dominance_matrix), \
         'Aggregate dominance matrix does not match'
+
+    expected_res_raw = [
+        [0, 0],
+        [2, 0],
+        [3, 0],
+        [1, 0],
+    ]
+    expected_res = np.array(expected_res_raw)
+    assert np.array_equal(res, expected_res), 'Reported aggregation results do not match'
+
+
+def test_electre_i_multi_expert_case():
+    path_to_task = TASKS_ROOT / '2_aircraft_multiple_experts' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+
+    decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(task)
+
+    res = decision_maker.run()
+
+    expected_res_raw = [
+        [0, 0],
+        [2, 0],
+        [3, 0],
+        [1, 0],
+    ]
+    expected_res = np.array(expected_res_raw)
+    assert np.array_equal(res, expected_res), 'Reported aggregation results do not match'
+
+
+def test_electre_i_multi_expert_case_no_expert_weights():
+    path_to_task = TASKS_ROOT / '3_aircraft_multiple_experts_no_weights' / 'task.json'
+    task = TaskModelFactory().from_json(path_to_task)
+
+    decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(task)
+
+    res = decision_maker.run()
 
     expected_res_raw = [
         [0, 0],

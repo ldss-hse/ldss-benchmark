@@ -15,7 +15,39 @@ def test_end_to_end_single_generator_numeric_task():
                                     num_alternatives=num_alternatives,
                                     num_criteria_groups=1,
                                     num_criteria_per_group=6,
-                                    task_type=TaskType.NUMERIC_ONLY)
+                                    task_type=TaskType.NUMERIC_ONLY,
+                                    equal_expert_weights=True,
+                                    generate_concrete_expert_weights=True)
+    res_dto: TaskDTOScheme = generator.run()
+
+    path = ARTIFACTS_PATH / 'tests_artifacts' / 'gen_task_1.json'
+    path.parent.mkdir(exist_ok=True, parents=True)
+    save_to_json(path, res_dto)
+
+    task = TaskModelFactory().from_json(path)
+
+    decision_maker: ElectreDecisionMaker = ElectreDecisionMaker(task)
+    res = decision_maker.run()
+    assert len(res) == num_alternatives, 'All alternatives should be present in ranking'
+
+    decision_maker: TopsisDecisionMaker = TopsisDecisionMaker(task)
+    res = decision_maker.run()
+    assert len(res) == num_alternatives, 'All alternatives should be present in ranking'
+
+    decision_maker: MLLDMDecisionMaker = MLLDMDecisionMaker(task)
+    res = decision_maker.run()
+    assert len(res) == num_alternatives, 'All alternatives should be present in ranking'
+
+
+def test_end_to_end_single_generator_crisp_task_multiple_experts():
+    num_alternatives = 4
+    generator = SingleTaskGenerator(num_experts=10,
+                                    num_alternatives=num_alternatives,
+                                    num_criteria_groups=1,
+                                    num_criteria_per_group=6,
+                                    task_type=TaskType.HYBRID_CRISP_LINGUISTIC,
+                                    equal_expert_weights=False,
+                                    generate_concrete_expert_weights=True)
     res_dto: TaskDTOScheme = generator.run()
 
     path = ARTIFACTS_PATH / 'tests_artifacts' / 'gen_task_1.json'

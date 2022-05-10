@@ -12,3 +12,7 @@ which python
 
 python -m pip install -r requirements.txt
 python -m pip install -r requirements_qa.txt
+
+mkdir -p benchmark/methods/ml_ldm/scripts/bin
+curl -L -o lingvo-dss-all.jar https://github.com/ldss-hse/ldss-core-aggregator/releases/download/decision_maker_v0.7/lingvo-dss-all.jar
+mv lingvo-dss-all.jar benchmark/methods/ml_ldm/scripts/bin/
