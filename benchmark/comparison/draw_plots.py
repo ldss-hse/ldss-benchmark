@@ -1,5 +1,4 @@
 import enum
-import os
 from typing import Optional
 
 import matplotlib.pyplot as plt
@@ -8,13 +7,6 @@ import numpy as np
 import pandas as pd
 
 from benchmark.comparison.enums import StatisticsNames
-
-
-def get_img_folder_path():
-    project_root = os.path.dirname(os.path.realpath(__file__))
-    tmp_artifacts_root = os.path.join(project_root, 'img')
-    return tmp_artifacts_root
-
 
 class Language(str, enum.Enum):
     ENGLIGH = 'ENGLISH'
@@ -32,12 +24,12 @@ class ChartConfig:
         'fontsize': 12
     }
     x_title_type: str
-    title: str
     file_format: str
+    title: Optional[str]
 
     def __init__(self, language: Language, coefficient_type: StatisticsNames, font_settings: Optional[dict],
                  x_title_type: str,
-                 title: str, file_format: str = 'png'):
+                 title: Optional[str] = None, file_format: str = 'png'):
         self.language = language
         self.coefficient_type = coefficient_type
         if font_settings is not None:
@@ -50,12 +42,12 @@ class ChartConfig:
 def create_chart(labels: list[str], rows: dict[str, np.ndarray], config: ChartConfig):
     i8n_mapping = {
         StatisticsNames.SPEARMAN_RHO: {
-            Language.RUSSIAN: 'Среднее значение rho',
-            Language.ENGLIGH: 'Mean of rho'
+            Language.RUSSIAN: 'Среднее значение\nкоэффициента корреляции Спирмена',
+            Language.ENGLIGH: 'Mean of Spearman\nrank correlation coefficient'
         },
         StatisticsNames.KENDALL_TAU: {
-            Language.RUSSIAN: 'Среднее значение tau',
-            Language.ENGLIGH: 'Mean of tau'
+            Language.RUSSIAN: 'Среднее значение\nкоэффициента корреляции Кендалла',
+            Language.ENGLIGH: 'Mean of Kendall tau\nrank correlation coefficient'
         },
         'alternatives': {
             Language.RUSSIAN: 'Количество альтернатив',
@@ -64,6 +56,16 @@ def create_chart(labels: list[str], rows: dict[str, np.ndarray], config: ChartCo
         'criteria': {
             Language.RUSSIAN: 'Пары сравниваемых методов',
             Language.ENGLIGH: 'Methods',
+        },
+        'legend_title_for_chart_by': {
+            'alternatives': {
+                Language.RUSSIAN: 'Количество\nкритериев',
+                Language.ENGLIGH: 'Number of\ncriteria',
+            },
+            'criteria': {
+                Language.RUSSIAN: 'Количество\nальтернатив',
+                Language.ENGLIGH: 'Number of\nalternatives',
+            }
         }
     }
 
@@ -89,8 +91,12 @@ def create_chart(labels: list[str], rows: dict[str, np.ndarray], config: ChartCo
     plt.xticks(labels, **config.font_settings)
     plt.yticks(**config.font_settings)
 
-    plt.title(config.title)
-    plt.legend()
+    if config.title is not None:
+        plt.title(config.title)
+    plt.legend(title=i8n_mapping['legend_title_for_chart_by'][config.x_title_type][config.language],
+               loc='lower right')
+    plt.tight_layout()
+
     # plt.show()
 
     return plt

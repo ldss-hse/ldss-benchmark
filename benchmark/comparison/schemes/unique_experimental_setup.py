@@ -33,6 +33,8 @@ class UniqueExperimentalSetupDTO:
     setup_info: SetupInfoDTO
     kendall_coefficients: Optional[dict[str, float]]
     spearman_coefficients: Optional[dict[str, float]]
+    top_1_matches: Optional[dict[str, int]]
+    total_runs: Optional[int] = None
 
     class Config:
         arbitrary_types_allowed = True

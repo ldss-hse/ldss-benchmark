@@ -19,7 +19,8 @@ class UniqueExperimentalSetup:
     def __init__(self, info):
         self._dto = UniqueExperimentalSetupDTO(setup_info=_create_from_json(info),
                                                kendall_coefficients={},
-                                               spearman_coefficients={})
+                                               spearman_coefficients={},
+                                               top_1_matches={})
         self._data = {}
 
     def add_new_data(self, method_name: MethodsNames, param: list[int]):
@@ -32,14 +33,23 @@ class UniqueExperimentalSetup:
         for method_a, method_b in pairs:
             kendall_coefficients = []
             spearman_coefficients = []
+
+            self._dto.total_runs = len(self._data[method_a])
+
+            top_1_hits = 0
             for ranks_a, ranks_b in zip(self._data[method_a], self._data[method_b]):
                 kendall_coefficients.append(kendalltau(ranks_a, ranks_b)[0])
                 spearman_coefficients.append(spearmanr(ranks_a, ranks_b)[0])
+
+                if ranks_a[0] == ranks_b[0]:
+                    top_1_hits += 1
 
             total_elements = len(kendall_coefficients)
             key = two_methods_to_key(method_a, method_b)
             self._dto.kendall_coefficients[key] = sum(kendall_coefficients) / total_elements
             self._dto.spearman_coefficients[key] = sum(spearman_coefficients) / total_elements
+
+            self._dto.top_1_matches[key] = top_1_hits
 
     @property
     def dto(self):

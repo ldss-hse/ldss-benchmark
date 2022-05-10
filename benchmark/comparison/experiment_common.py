@@ -1,10 +1,11 @@
 import shutil
 
 from benchmark.comparison.correlation_report import CorrelationReport
+from benchmark.comparison.draw_plots import Language
 from benchmark.comparison.generate_tasks import generate_tasks
+from benchmark.comparison.process_report import collect_top_1_matches_from_dto, visualize_correlation_report
 from benchmark.comparison.run_decision_makers import run_decision_makers
 from benchmark.comparison.schemes.correlation_report_dto import ExperimentInfoDTO
-from benchmark.comparison.visualize import visualize_correlation_report
 from benchmark.task.generator.dumper import save_to_json
 
 
@@ -37,4 +38,6 @@ def run_experiment(experiment_config: ExperimentInfoDTO, experiment_root_path):
 
         save_to_json(correlation_report_path, correlation_report.dto)
 
-    visualize_correlation_report(correlation_report_path, experiment_visualization_path)
+    collect_top_1_matches_from_dto(correlation_report_path, res_dir_path=correlation_report_dir_path)
+
+    visualize_correlation_report(correlation_report_path, experiment_visualization_path, language=Language.RUSSIAN)
