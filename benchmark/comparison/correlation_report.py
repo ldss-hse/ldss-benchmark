@@ -38,8 +38,10 @@ class UniqueExperimentalSetup:
 
             top_1_hits = 0
             for ranks_a, ranks_b in zip(self._data[method_a], self._data[method_b]):
-                kendall_coefficients.append(kendalltau(ranks_a, ranks_b)[0])
-                spearman_coefficients.append(spearmanr(ranks_a, ranks_b)[0])
+                list_a = ranks_a[:]
+                list_b = ranks_b[:]
+                kendall_coefficients.append(kendalltau(list_a, list_b)[0])
+                spearman_coefficients.append(spearmanr(list_a, list_b)[0])
 
                 if ranks_a[0] == ranks_b[0]:
                     top_1_hits += 1
@@ -111,7 +113,11 @@ class CorrelationReport:
             with file_path.open(encoding='utf-8') as json_file:
                 data = json.load(json_file)
 
-            if data.get('failed'):
+            method_failed = data.get('failed')
+            if method_failed is not None:
+                if self._dto.fails is None:
+                    self._dto.fails = {}
+                self._dto.fails[method_failed] = self._dto.fails.get(method_failed, 0) + 1
                 print('skip due to error.')
                 continue
 

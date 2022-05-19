@@ -25,6 +25,7 @@ class ExperimentInfoDTO:
 class CorrelationReportDTO:
     unique_configurations: list[UniqueExperimentalSetupDTO]
     experiment_info: ExperimentInfoDTO
+    fails: Optional[dict[str, int]] = None
 
     class Config:
         arbitrary_types_allowed = True
