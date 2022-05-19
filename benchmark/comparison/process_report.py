@@ -155,7 +155,7 @@ def save_averages_pairwise_chart(correlation_report_df: pd.DataFrame, stats_type
     config = ChartConfig(language=language,
                          coefficient_type=stats_type,
                          font_settings=None,
-                         x_title_type='alternatives')
+                         x_title_type='criteria')
     compiled_plot = create_chart(labels=labels, rows=rows, config=config)
 
     file_name = f'aggregated_all_methods_{stats_type}'
