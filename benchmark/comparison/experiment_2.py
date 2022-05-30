@@ -18,8 +18,8 @@ def main():
                                           generate_concrete_expert_weights=True)
 
     # Additional settings for enabling/disabling first three phases in debug purposes
-    experiment_config.generate_new_dataset = True
-    experiment_config.execute_decision_makers = True
+    experiment_config.generate_new_dataset = False
+    experiment_config.execute_decision_makers = False
     experiment_config.calculate_correlation_reports = True
 
     run_experiment(experiment_config, experiment_root_path)

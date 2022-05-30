@@ -40,4 +40,4 @@ def run_experiment(experiment_config: ExperimentInfoDTO, experiment_root_path):
 
     collect_top_1_matches_from_dto(correlation_report_path, res_dir_path=correlation_report_dir_path)
 
-    visualize_correlation_report(correlation_report_path, experiment_visualization_path, language=Language.RUSSIAN)
+    visualize_correlation_report(correlation_report_path, experiment_visualization_path, language=Language.ENGLIGH)
